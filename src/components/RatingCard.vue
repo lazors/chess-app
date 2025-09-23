@@ -55,17 +55,17 @@ const winPercentage = computed(() => {
 
 <style scoped>
 .rating-card {
-  background: white;
+  background: var(--bg-secondary);
   border-radius: 8px;
   padding: 1.5rem;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 8px var(--shadow);
   border-left: 4px solid;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.3s ease;
 }
 
 .rating-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  box-shadow: 0 4px 12px var(--shadow);
 }
 
 .rating-header {
@@ -77,7 +77,7 @@ const winPercentage = computed(() => {
 
 .rating-header h3 {
   margin: 0;
-  color: #2c3e50;
+  color: var(--text-primary);
   font-size: 1.2rem;
 }
 
@@ -100,14 +100,14 @@ const winPercentage = computed(() => {
 }
 
 .record-item.total {
-  border-top: 1px solid #eee;
+  border-top: 1px solid var(--border-color);
   padding-top: 0.5rem;
   margin-top: 0.25rem;
   font-weight: 600;
 }
 
 .record-label {
-  color: #666;
+  color: var(--text-secondary);
   font-size: 0.9rem;
 }
 
@@ -130,12 +130,13 @@ const winPercentage = computed(() => {
 .win-percentage {
   text-align: center;
   padding: 0.5rem;
-  background: #f8f9fa;
+  background: var(--bg-tertiary);
   border-radius: 4px;
   margin-top: 0.5rem;
   font-size: 0.9rem;
   font-weight: 600;
-  color: #2c3e50;
+  color: var(--text-primary);
+  transition: background-color 0.3s ease;
 }
 
 @media (max-width: 480px) {

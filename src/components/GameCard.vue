@@ -137,10 +137,10 @@ const formatTimeClass = (timeClass: string): string => {
 
 <style scoped>
 .game-card {
-  background: white;
+  background: var(--bg-secondary);
   border-radius: 8px;
   padding: 1.5rem;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 8px var(--shadow);
   cursor: pointer;
   transition: all 0.2s ease;
   border-left: 4px solid;
@@ -148,7 +148,7 @@ const formatTimeClass = (timeClass: string): string => {
 
 .game-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  box-shadow: 0 4px 12px var(--shadow);
 }
 
 .game-card.win {
@@ -187,7 +187,7 @@ const formatTimeClass = (timeClass: string): string => {
 
 .result-text {
   font-weight: 600;
-  color: #2c3e50;
+  color: var(--text-primary);
 }
 
 .result-badge {
@@ -215,7 +215,7 @@ const formatTimeClass = (timeClass: string): string => {
 }
 
 .game-date {
-  color: #666;
+  color: var(--text-secondary);
   font-size: 0.9rem;
 }
 
@@ -242,7 +242,7 @@ const formatTimeClass = (timeClass: string): string => {
 }
 
 .player.current {
-  background: #e3f2fd;
+  background: var(--loading-bg);
   font-weight: 600;
 }
 
@@ -255,13 +255,13 @@ const formatTimeClass = (timeClass: string): string => {
 }
 
 .rating {
-  color: #666;
+  color: var(--text-secondary);
   font-size: 0.9rem;
 }
 
 .vs {
   font-weight: bold;
-  color: #666;
+  color: var(--text-secondary);
 }
 
 .game-meta {
@@ -269,8 +269,9 @@ const formatTimeClass = (timeClass: string): string => {
   justify-content: space-around;
   gap: 1rem;
   padding: 0.5rem;
-  background: #f8f9fa;
+  background: var(--bg-tertiary);
   border-radius: 4px;
+  transition: background-color 0.3s ease;
 }
 
 .game-meta > div {
@@ -282,12 +283,12 @@ const formatTimeClass = (timeClass: string): string => {
 
 .label {
   font-size: 0.8rem;
-  color: #666;
+  color: var(--text-secondary);
 }
 
 .value {
   font-weight: 600;
-  color: #2c3e50;
+  color: var(--text-primary);
 }
 
 .badge {
@@ -304,8 +305,9 @@ const formatTimeClass = (timeClass: string): string => {
   justify-content: space-around;
   gap: 1rem;
   padding: 0.5rem;
-  background: #f0f4f7;
+  background: var(--bg-tertiary);
   border-radius: 4px;
+  transition: background-color 0.3s ease;
 }
 
 .accuracy {
@@ -321,12 +323,12 @@ const formatTimeClass = (timeClass: string): string => {
   align-items: center;
   margin-top: 1rem;
   padding-top: 1rem;
-  border-top: 1px solid #eee;
+  border-top: 1px solid var(--border-color);
 }
 
 .view-game-btn {
   padding: 0.5rem 1rem;
-  background: #42b883;
+  background: var(--accent-primary);
   color: white;
   border: none;
   border-radius: 4px;
@@ -336,7 +338,7 @@ const formatTimeClass = (timeClass: string): string => {
 }
 
 .view-game-btn:hover {
-  background: #369870;
+  background: var(--accent-secondary);
 }
 
 .chess-com-link {
