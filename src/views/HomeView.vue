@@ -77,20 +77,20 @@ const clearData = () => {
 }
 
 .status.loading {
-  background: #e3f2fd;
-  border: 1px solid #90caf9;
-  color: #1976d2;
+  background: var(--loading-bg);
+  border: 1px solid var(--loading-border);
+  color: var(--loading-text);
 }
 
 .status.error {
-  background: #ffebee;
-  border: 1px solid #ef5350;
-  color: #c62828;
+  background: var(--error-bg);
+  border: 1px solid var(--error-border);
+  color: var(--error-text);
 }
 
 .status.success {
-  background: #e8f5e8;
-  border: 1px solid #81c784;
+  background: var(--success-bg);
+  border: 1px solid var(--success-border);
 }
 
 .user-profile {
@@ -111,12 +111,12 @@ const clearData = () => {
 
 .user-info h2 {
   margin: 0 0 0.5rem 0;
-  color: #2c3e50;
+  color: var(--text-primary);
 }
 
 .user-info .username {
   margin: 0 0 0.25rem 0;
-  color: #666;
+  color: var(--text-secondary);
   font-weight: 500;
 }
 
@@ -128,7 +128,7 @@ const clearData = () => {
 
 .user-info .location {
   margin: 0;
-  color: #7f8c8d;
+  color: var(--text-muted);
   font-size: 0.9rem;
 }
 
@@ -144,18 +144,32 @@ const clearData = () => {
 .user-input input {
   padding: 0.5rem;
   margin-right: 1rem;
-  border: 1px solid #ddd;
+  border: 1px solid var(--border-color);
   border-radius: 4px;
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  transition: border-color 0.3s ease, background-color 0.3s ease;
+}
+
+.user-input input:focus {
+  outline: none;
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 0 2px var(--input-focus-shadow);
 }
 
 .user-input button {
   padding: 0.5rem 1rem;
-  background: #42b883;
+  background: var(--accent-primary);
   color: white;
   border: none;
   border-radius: 4px;
   cursor: pointer;
   margin-right: 0.5rem;
+  transition: background-color 0.3s ease;
+}
+
+.user-input button:hover:not(:disabled) {
+  background: var(--accent-secondary);
 }
 
 .user-input button:disabled {
