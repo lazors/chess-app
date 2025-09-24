@@ -18,6 +18,11 @@ const router = createRouter({
       path: '/stats',
       name: 'stats',
       component: () => import('../views/StatsView.vue')
+    },
+    {
+      path: '/leaderboards',
+      name: 'leaderboards',
+      component: () => import('../views/LeaderboardsView.vue')
     }
   ]
 })

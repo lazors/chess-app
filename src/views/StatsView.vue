@@ -109,6 +109,105 @@
           </div>
         </div>
       </div>
+
+      <!-- Opening Statistics -->
+      <div v-if="chessStore.openingStats.length > 0" class="openings-section">
+        <h2>Opening Statistics</h2>
+        <div class="openings-grid">
+          <div
+            v-for="opening in chessStore.openingStats"
+            :key="opening.opening"
+            class="opening-card"
+          >
+            <h3 class="opening-name">{{ opening.opening }}</h3>
+            <div class="opening-stats">
+              <div class="stat-row">
+                <span class="stat-label">Games:</span>
+                <span class="stat-value">{{ opening.games }}</span>
+              </div>
+              <div class="stat-row">
+                <span class="stat-label">Win Rate:</span>
+                <span class="stat-value" :class="getWinRateClass(opening.winRate)">{{ opening.winRate }}%</span>
+              </div>
+              <div class="stat-row">
+                <span class="stat-label">W/L/D:</span>
+                <span class="stat-value">{{ opening.wins }}/{{ opening.losses }}/{{ opening.draws }}</span>
+              </div>
+              <div class="stat-row">
+                <span class="stat-label">Avg Rating:</span>
+                <span class="stat-value">{{ opening.averageRating }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tournaments Section -->
+      <div v-if="chessStore.tournaments.length > 0" class="tournaments-section">
+        <h2>Recent Tournaments</h2>
+        <div class="tournaments-list">
+          <div
+            v-for="tournament in chessStore.tournaments.slice(0, 5)"
+            :key="tournament.url"
+            class="tournament-card"
+          >
+            <div class="tournament-header">
+              <h4>{{ tournament.title }}</h4>
+              <span class="tournament-status" :class="tournament.status">
+                {{ formatStatus(tournament.status) }}
+              </span>
+            </div>
+            <div class="tournament-details">
+              <p class="tournament-type">{{ tournament.type.toUpperCase() }} - {{ tournament.time_class }}</p>
+              <p class="tournament-players">{{ tournament.total_players }} players</p>
+              <p class="tournament-date">{{ formatDate(tournament.start_time) }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Clubs Section -->
+      <div v-if="chessStore.clubs.length > 0" class="clubs-section">
+        <h2>Chess Clubs</h2>
+        <div class="clubs-grid">
+          <div
+            v-for="club in chessStore.clubs"
+            :key="club.club_id"
+            class="club-card"
+          >
+            <div class="club-header">
+              <img v-if="club.icon" :src="club.icon" :alt="club.name" class="club-icon" />
+              <div>
+                <h4>{{ club.name }}</h4>
+                <p class="club-joined">Joined {{ formatDate(club.joined) }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Team Matches Section -->
+      <div v-if="chessStore.teamMatches.length > 0" class="matches-section">
+        <h2>Team Matches</h2>
+        <div class="matches-list">
+          <div
+            v-for="match in chessStore.teamMatches.slice(0, 5)"
+            :key="match.url"
+            class="match-card"
+          >
+            <div class="match-header">
+              <h4>vs {{ match.opponent }}</h4>
+              <span class="match-result" :class="match.result">
+                {{ match.result.toUpperCase() }}
+              </span>
+            </div>
+            <div class="match-details">
+              <p>{{ match.time_class }} - {{ match.status }}</p>
+              <p>{{ formatDate(match.start_time) }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -129,6 +228,17 @@ const winRate = computed(() => {
 const formatDate = (timestamp?: number): string => {
   if (!timestamp) return 'Unknown'
   return new Date(timestamp * 1000).toLocaleDateString()
+}
+
+const formatStatus = (status: string): string => {
+  return status.replace('_', ' ').toUpperCase()
+}
+
+const getWinRateClass = (winRate: number): string => {
+  if (winRate >= 60) return 'excellent'
+  if (winRate >= 50) return 'good'
+  if (winRate >= 40) return 'average'
+  return 'poor'
 }
 </script>
 
@@ -270,6 +380,193 @@ const formatDate = (timestamp?: number): string => {
   font-size: 1.5rem;
   font-weight: bold;
   color: #2196F3;
+}
+
+.openings-section,
+.tournaments-section,
+.clubs-section,
+.matches-section {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.openings-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.opening-card {
+  background: #f8f9fa;
+  border: 1px solid #e9ecef;
+  border-radius: 6px;
+  padding: 1rem;
+  transition: transform 0.2s ease;
+}
+
+.opening-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.opening-name {
+  font-size: 1.1rem;
+  margin: 0 0 0.75rem 0;
+  color: #2c3e50;
+  font-weight: 600;
+}
+
+.opening-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.stat-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.stat-label {
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.stat-value {
+  font-weight: 600;
+}
+
+.stat-value.excellent {
+  color: #4CAF50;
+}
+
+.stat-value.good {
+  color: #8BC34A;
+}
+
+.stat-value.average {
+  color: #FF9800;
+}
+
+.stat-value.poor {
+  color: #f44336;
+}
+
+.tournaments-list,
+.matches-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.tournament-card,
+.match-card {
+  background: #f8f9fa;
+  border: 1px solid #e9ecef;
+  border-radius: 6px;
+  padding: 1rem;
+}
+
+.tournament-header,
+.match-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.tournament-header h4,
+.match-header h4 {
+  margin: 0;
+  color: #2c3e50;
+}
+
+.tournament-status,
+.match-result {
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+.tournament-status.finished,
+.match-result.win {
+  background: #d4edda;
+  color: #155724;
+}
+
+.tournament-status.in_progress {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.tournament-status.registration {
+  background: #d1ecf1;
+  color: #0c5460;
+}
+
+.match-result.loss {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+.match-result.draw {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.tournament-details,
+.match-details {
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.tournament-details p,
+.match-details p {
+  margin: 0.25rem 0;
+}
+
+.clubs-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.club-card {
+  background: #f8f9fa;
+  border: 1px solid #e9ecef;
+  border-radius: 6px;
+  padding: 1rem;
+}
+
+.club-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.club-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 4px;
+}
+
+.club-header h4 {
+  margin: 0;
+  color: #2c3e50;
+}
+
+.club-joined {
+  margin: 0.25rem 0 0 0;
+  font-size: 0.9rem;
+  color: #666;
 }
 
 h1, h2 {

@@ -51,9 +51,7 @@ const chessStore = useChessStore()
 
 const fetchUserData = async () => {
   if (username.value) {
-    await chessStore.fetchUserProfile(username.value)
-    await chessStore.fetchUserStats(username.value)
-    await chessStore.fetchRecentGames(username.value)
+    await chessStore.fetchAllUserData(username.value)
   }
 }
 

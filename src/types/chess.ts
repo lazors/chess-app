@@ -71,3 +71,92 @@ export interface PlayerGame {
   username: string
   uuid: string
 }
+
+export interface GameArchive {
+  archives: string[]
+}
+
+export interface Tournament {
+  url: string
+  '@id': string
+  title: string
+  description: string
+  creator: string
+  status: 'finished' | 'in_progress' | 'registration'
+  finish_time?: number
+  start_time: number
+  time_class: string
+  time_control: string
+  type: 'arena' | 'swiss' | 'elimination'
+  total_players: number
+}
+
+export interface Club {
+  '@id': string
+  name: string
+  club_id: number
+  icon: string
+  url: string
+  joined: number
+}
+
+export interface TeamMatch {
+  '@id': string
+  url: string
+  opponent: string
+  start_time: number
+  end_time?: number
+  time_class: string
+  status: 'finished' | 'in_progress'
+  result: 'win' | 'loss' | 'draw'
+}
+
+export interface OpeningStats {
+  opening: string
+  eco?: string
+  games: number
+  wins: number
+  losses: number
+  draws: number
+  winRate: number
+  averageRating: number
+}
+
+export interface LeaderboardEntry {
+  player_id: number
+  '@id': string
+  url: string
+  username: string
+  score: number
+  rank: number
+  country: string
+  title?: string
+  name?: string
+  status: string
+  avatar?: string
+  trend_score?: {
+    direction: number
+    delta: number
+  }
+  trend_rank?: {
+    direction: number
+    delta: number
+  }
+  flair_code?: string
+}
+
+export interface Leaderboards {
+  daily: LeaderboardEntry[]
+  daily960: LeaderboardEntry[]
+  live_rapid: LeaderboardEntry[]
+  live_blitz: LeaderboardEntry[]
+  live_bullet: LeaderboardEntry[]
+  live_bughouse: LeaderboardEntry[]
+  live_blitz960: LeaderboardEntry[]
+  live_threecheck: LeaderboardEntry[]
+  live_crazyhouse: LeaderboardEntry[]
+  live_kingofthehill: LeaderboardEntry[]
+  tactics: LeaderboardEntry[]
+  rush: LeaderboardEntry[]
+  battle: LeaderboardEntry[]
+}

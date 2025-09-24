@@ -1,12 +1,27 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import type { ChessComProfile, ChessComStats, ChessComGame } from '@/types/chess'
+import type {
+  ChessComProfile,
+  ChessComStats,
+  ChessComGame,
+  Tournament,
+  Club,
+  TeamMatch,
+  OpeningStats,
+  Leaderboards
+} from '@/types/chess'
 import { chessComApi } from '@/services/chessComApi'
 
 export const useChessStore = defineStore('chess', () => {
   const profile = ref<ChessComProfile | null>(null)
   const stats = ref<ChessComStats | null>(null)
   const recentGames = ref<ChessComGame[]>([])
+  const historicalGames = ref<ChessComGame[]>([])
+  const tournaments = ref<Tournament[]>([])
+  const clubs = ref<Club[]>([])
+  const teamMatches = ref<TeamMatch[]>([])
+  const openingStats = ref<OpeningStats[]>([])
+  const leaderboards = ref<Partial<Leaderboards>>({})
   const loading = ref(false)
   const error = ref<string | null>(null)
 
@@ -98,10 +113,109 @@ export const useChessStore = defineStore('chess', () => {
     }
   }
 
+  async function fetchTournaments(username: string) {
+    loading.value = true
+    error.value = null
+
+    try {
+      tournaments.value = await chessComApi.getPlayerTournaments(username)
+    } catch (err) {
+      error.value = err instanceof Error ? err.message : 'Failed to fetch tournaments'
+      console.error('Error fetching tournaments:', err)
+    } finally {
+      loading.value = false
+    }
+  }
+
+  async function fetchClubs(username: string) {
+    loading.value = true
+    error.value = null
+
+    try {
+      clubs.value = await chessComApi.getPlayerClubs(username)
+    } catch (err) {
+      error.value = err instanceof Error ? err.message : 'Failed to fetch clubs'
+      console.error('Error fetching clubs:', err)
+    } finally {
+      loading.value = false
+    }
+  }
+
+  async function fetchTeamMatches(username: string) {
+    loading.value = true
+    error.value = null
+
+    try {
+      teamMatches.value = await chessComApi.getPlayerMatches(username)
+    } catch (err) {
+      error.value = err instanceof Error ? err.message : 'Failed to fetch team matches'
+      console.error('Error fetching team matches:', err)
+    } finally {
+      loading.value = false
+    }
+  }
+
+  async function fetchHistoricalGames(username: string, monthsBack = 6) {
+    loading.value = true
+    error.value = null
+
+    try {
+      historicalGames.value = await chessComApi.getHistoricalGames(username, monthsBack)
+      openingStats.value = chessComApi.analyzeOpenings(historicalGames.value)
+    } catch (err) {
+      error.value = err instanceof Error ? err.message : 'Failed to fetch historical games'
+      console.error('Error fetching historical games:', err)
+    } finally {
+      loading.value = false
+    }
+  }
+
+  async function fetchLeaderboards() {
+    loading.value = true
+    error.value = null
+
+    try {
+      leaderboards.value = await chessComApi.getLeaderboards()
+    } catch (err) {
+      error.value = err instanceof Error ? err.message : 'Failed to fetch leaderboards'
+      console.error('Error fetching leaderboards:', err)
+    } finally {
+      loading.value = false
+    }
+  }
+
+  async function fetchAllUserData(username: string) {
+    loading.value = true
+    error.value = null
+
+    try {
+      await Promise.allSettled([
+        fetchUserProfile(username),
+        fetchUserStats(username),
+        fetchRecentGames(username),
+        fetchHistoricalGames(username, 6),
+        fetchTournaments(username),
+        fetchClubs(username),
+        fetchTeamMatches(username)
+      ])
+    } catch (err) {
+      error.value = err instanceof Error ? err.message : 'Failed to fetch complete user data'
+      console.error('Error fetching complete user data:', err)
+    } finally {
+      loading.value = false
+    }
+  }
+
   function clearData() {
     profile.value = null
     stats.value = null
     recentGames.value = []
+    historicalGames.value = []
+    tournaments.value = []
+    clubs.value = []
+    teamMatches.value = []
+    openingStats.value = []
+    leaderboards.value = {}
     error.value = null
   }
 
@@ -110,6 +224,12 @@ export const useChessStore = defineStore('chess', () => {
     profile,
     stats,
     recentGames,
+    historicalGames,
+    tournaments,
+    clubs,
+    teamMatches,
+    openingStats,
+    leaderboards,
     loading,
     error,
 
@@ -127,6 +247,12 @@ export const useChessStore = defineStore('chess', () => {
     fetchUserProfile,
     fetchUserStats,
     fetchRecentGames,
+    fetchHistoricalGames,
+    fetchTournaments,
+    fetchClubs,
+    fetchTeamMatches,
+    fetchLeaderboards,
+    fetchAllUserData,
     clearData
   }
 })

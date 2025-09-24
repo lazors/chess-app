@@ -5,6 +5,7 @@
         <RouterLink to="/">Home</RouterLink>
         <RouterLink to="/games">Games</RouterLink>
         <RouterLink to="/stats">Statistics</RouterLink>
+        <RouterLink to="/leaderboards">Leaderboards</RouterLink>
       </div>
       <ThemeToggle />
     </nav>
