@@ -154,3 +154,139 @@ export function getOpeningByMoves(moves: string): ECOOpening | null {
   }
   return null
 }
+
+// Map opening variations to their base opening names
+export const OPENING_FAMILIES: Record<string, string> = {
+  // Caro-Kann Defense family
+  'Caro-Kann Defense': 'Caro-Kann Defense',
+  'Caro-Kann Defense: Two Knights Attack': 'Caro-Kann Defense',
+  'Caro-Kann Defense: Advance Variation': 'Caro-Kann Defense',
+  'Caro-Kann Defense: Exchange Variation': 'Caro-Kann Defense',
+  'Caro-Kann Defense: Panov-Botvinnik Attack': 'Caro-Kann Defense',
+  'Caro-Kann Defense: Main Line': 'Caro-Kann Defense',
+  'Caro-Kann Defense: Bronstein-Larsen Variation': 'Caro-Kann Defense',
+  'Caro-Kann Defense: Steinitz Variation': 'Caro-Kann Defense',
+  'Caro-Kann Defense: Classical Variation': 'Caro-Kann Defense',
+  'Caro-Kann Defense: Classical Variation, Spassky System': 'Caro-Kann Defense',
+
+  // Sicilian Defense family
+  'Sicilian Defense': 'Sicilian Defense',
+  'Sicilian Defense: Smith-Morra Gambit': 'Sicilian Defense',
+  'Sicilian Defense: Alapin Variation': 'Sicilian Defense',
+  'Sicilian Defense: Closed Variation': 'Sicilian Defense',
+  'Sicilian Defense: Hungarian Variation': 'Sicilian Defense',
+  'Sicilian Defense: O\'Kelly Variation': 'Sicilian Defense',
+  'Sicilian Defense: Nimzowitsch Variation': 'Sicilian Defense',
+  'Sicilian Defense: Old Sicilian': 'Sicilian Defense',
+
+  // French Defense family
+  'French Defense': 'French Defense',
+  'French Defense: Exchange Variation': 'French Defense',
+  'French Defense: Advance Variation': 'French Defense',
+  'French Defense: Tarrasch Variation': 'French Defense',
+  'French Defense: Tarrasch Variation, Guimard Main Line': 'French Defense',
+  'French Defense: Tarrasch Variation, Closed System': 'French Defense',
+  'French Defense: Tarrasch Variation, Open System': 'French Defense',
+  'French Defense: Paulsen Variation': 'French Defense',
+  'French Defense: Classical Variation': 'French Defense',
+  'French Defense: MacCutcheon Variation': 'French Defense',
+  'French Defense: Classical Variation, Alekhine-Chatard Attack': 'French Defense',
+  'French Defense: Classical Variation, Steinitz Variation': 'French Defense',
+  'French Defense: Winawer Variation': 'French Defense',
+  'French Defense: Winawer Variation, Advance Line': 'French Defense',
+
+  // Queen's Gambit family
+  'Queen\'s Gambit Declined': 'Queen\'s Gambit',
+  'Queen\'s Gambit Declined: Chigorin Defense': 'Queen\'s Gambit',
+  'Queen\'s Gambit Declined: Albin Countergambit': 'Queen\'s Gambit',
+  'Queen\'s Gambit Declined: Slav Defense': 'Queen\'s Gambit',
+  'Queen\'s Gambit Declined: Slav Defense, Exchange Variation': 'Queen\'s Gambit',
+  'Queen\'s Gambit Declined: Slav Defense, Four Knights Variation': 'Queen\'s Gambit',
+  'Queen\'s Gambit Declined: Slav Defense, Steiner Variation': 'Queen\'s Gambit',
+  'Queen\'s Gambit Declined: Slav Defense, Czech Variation': 'Queen\'s Gambit',
+  'Queen\'s Gambit Declined: Slav Defense, Dutch Variation': 'Queen\'s Gambit',
+  'Queen\'s Gambit Accepted': 'Queen\'s Gambit',
+
+  // English Opening family
+  'English Opening': 'English Opening',
+  'English Opening: Caro-Kann Defensive System': 'English Opening',
+  'English Opening: Agincourt Defense': 'English Opening',
+  'English Opening: Agincourt Defense, Neo-Catalan': 'English Opening',
+  'English Opening: Anglo-Indian Defense': 'English Opening',
+  'English Opening: Anglo-Indian Defense, Anglo-Grünfeld Variation': 'English Opening',
+  'English Opening: Anglo-Indian Defense, Hedgehog System': 'English Opening',
+  'English Opening: Mikenas-Carls Variation': 'English Opening',
+  'English Opening: Mikenas-Carls, Sicilian Variation': 'English Opening',
+  'English Opening: King\'s English Variation': 'English Opening',
+  'English Opening: King\'s English Variation, Reversed Sicilian': 'English Opening',
+  'English Opening: King\'s English Variation, Two Knights Variation': 'English Opening',
+  'English Opening: King\'s English Variation, Closed System': 'English Opening',
+  'English Opening: King\'s English Variation, Three Knights System': 'English Opening',
+  'English Opening: King\'s English Variation, Four Knights System': 'English Opening',
+  'English Opening: King\'s English Variation, Four Knights, Fianchetto Variation': 'English Opening',
+  'English Opening: Symmetrical Variation': 'English Opening',
+
+  // Alekhine's Defense family
+  'Alekhine\'s Defense': 'Alekhine\'s Defense',
+  'Alekhine\'s Defense: Four Pawns Attack': 'Alekhine\'s Defense',
+  'Alekhine\'s Defense: Modern Variation': 'Alekhine\'s Defense',
+
+  // Pirc Defense family
+  'Pirc Defense': 'Pirc Defense',
+  'Pirc Defense: Classical System': 'Pirc Defense',
+  'Pirc Defense: Austrian Attack': 'Pirc Defense',
+
+  // Réti Opening family
+  'Réti Opening': 'Réti Opening',
+  'Réti Opening: King\'s Indian Attack': 'Réti Opening',
+  'Réti Opening: Nimzowitsch-Larsen Attack': 'Réti Opening',
+  'Réti Opening: Advance Variation': 'Réti Opening',
+
+  // Bird's Opening family
+  'Bird\'s Opening': 'Bird\'s Opening',
+  'Bird\'s Opening: Dutch Variation': 'Bird\'s Opening',
+
+  // Nimzo-Indian Defense family
+  'Nimzo-Indian Defense': 'Nimzo-Indian Defense',
+
+  // Queen's Indian Defense family
+  'Queen\'s Indian Defense': 'Queen\'s Indian Defense',
+  'Queen\'s Indian Defense: Fianchetto Variation': 'Queen\'s Indian Defense',
+  'Queen\'s Indian Defense: Nimzowitsch Variation': 'Queen\'s Indian Defense',
+  'Queen\'s Indian Defense: Capablanca Variation': 'Queen\'s Indian Defense',
+  'Queen\'s Indian Defense: Traditional Variation': 'Queen\'s Indian Defense',
+  'Queen\'s Indian Defense: Old Main Line': 'Queen\'s Indian Defense',
+
+  // Catalan Opening family
+  'Catalan Opening': 'Catalan Opening',
+  'Catalan Opening: Open Defense': 'Catalan Opening',
+  'Catalan Opening: Open Defense, Classical Line': 'Catalan Opening',
+  'Catalan Opening: Closed Defense': 'Catalan Opening',
+
+  // King's Indian Attack family
+  'King\'s Indian Attack': 'King\'s Indian Attack',
+  'King\'s Indian Attack: French Variation': 'King\'s Indian Attack',
+}
+
+export function getBaseOpeningName(openingName: string): string {
+  // First try exact match
+  if (OPENING_FAMILIES[openingName]) {
+    return OPENING_FAMILIES[openingName]
+  }
+
+  // Try to find a partial match for unlisted variations
+  for (const [variation, base] of Object.entries(OPENING_FAMILIES)) {
+    if (openingName.includes(base.split(':')[0]) && openingName !== base) {
+      return base
+    }
+  }
+
+  // If no match found, try to extract the main opening name before the colon
+  const colonIndex = openingName.indexOf(':')
+  if (colonIndex > 0) {
+    const baseName = openingName.substring(0, colonIndex).trim()
+    return baseName
+  }
+
+  return openingName
+}

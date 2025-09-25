@@ -88,9 +88,16 @@ The app uses the Chess.com public API to fetch:
 ### Opening Analysis Features
 - **ECO Code Mapping**: Comprehensive database of Encyclopedia of Chess Openings (ECO) codes A00-E99
 - **Meaningful Opening Names**: Proper chess opening names instead of generic ECO codes
+- **Combined Variations**: All opening variations grouped under main opening families
+  - All Caro-Kann variations → "Caro-Kann Defense"
+  - All Sicilian variations → "Sicilian Defense"
+  - All French Defense variations → "French Defense"
+  - All Queen's Gambit variations → "Queen's Gambit"
+  - And many more opening families
 - **Separate Statistics**: Analyzes openings played as White vs Black pieces
 - **Color-Specific Performance**: Win rates and statistics for each color
 - **Enhanced Extraction**: Improved PGN parsing with variation support
+- **Smart Grouping**: Automatic fallback for unlisted variations using colon-separated naming
 
 ## State Management
 - `useChessStore`: Manages user data, games, and statistics
@@ -107,9 +114,10 @@ The `ChessComApiService` provides comprehensive methods:
 - `getHistoricalGames(username, monthsBack)` - Extended game history
 
 ### Advanced Analysis
-- `analyzeOpeningsByColor(games, username)` - Separate White/Black opening stats
-- `analyzeOpenings(games, username)` - Combined opening analysis (legacy)
+- `analyzeOpeningsByColor(games, username)` - Separate White/Black opening stats with combined variations
+- `analyzeOpenings(games, username)` - Combined opening analysis (legacy) with variation grouping
 - `extractOpeningFromPGN(pgn)` - Enhanced opening name extraction
+- `getBaseOpeningName(openingName)` - Groups opening variations into main families
 
 ### Community Data
 - `getPlayerTournaments(username)` - Tournament participation

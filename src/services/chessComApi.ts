@@ -11,7 +11,7 @@ import type {
   ColoredOpeningStats,
   Leaderboards
 } from '@/types/chess'
-import { getOpeningName } from '@/data/ecoMappings'
+import { getOpeningName, getBaseOpeningName } from '@/data/ecoMappings'
 
 const CHESS_COM_API_BASE = 'https://api.chess.com/pub'
 
@@ -193,6 +193,9 @@ export class ChessComApiService {
       const openingData = this.extractOpeningFromPGN(game.pgn)
       if (!openingData) return
 
+      // Combine variations into base opening names
+      const baseOpeningName = getBaseOpeningName(openingData.name)
+
       const isPlayerWhite = game.white.username.toLowerCase() === targetUsername.toLowerCase()
       const isPlayerBlack = game.black.username.toLowerCase() === targetUsername.toLowerCase()
 
@@ -202,7 +205,7 @@ export class ChessComApiService {
       const playerRating = isPlayerWhite ? game.white.rating : game.black.rating
       const targetMap = isPlayerWhite ? whiteOpenings : blackOpenings
 
-      const current = targetMap.get(openingData.name) || {
+      const current = targetMap.get(baseOpeningName) || {
         games: 0,
         wins: 0,
         losses: 0,
@@ -232,7 +235,7 @@ export class ChessComApiService {
           break
       }
 
-      targetMap.set(openingData.name, current)
+      targetMap.set(baseOpeningName, current)
     })
 
     const processOpenings = (openingMap: typeof whiteOpenings, color: 'white' | 'black'): OpeningStats[] => {
@@ -317,7 +320,10 @@ export class ChessComApiService {
       const openingData = this.extractOpeningFromPGN(game.pgn)
       if (!openingData) return
 
-      const current = openingMap.get(openingData.name) || {
+      // Combine variations into base opening names
+      const baseOpeningName = getBaseOpeningName(openingData.name)
+
+      const current = openingMap.get(baseOpeningName) || {
         games: 0,
         wins: 0,
         losses: 0,
@@ -327,7 +333,7 @@ export class ChessComApiService {
       }
 
       current.games++
-      openingMap.set(openingData.name, current)
+      openingMap.set(baseOpeningName, current)
     })
 
     return Array.from(openingMap.entries())
