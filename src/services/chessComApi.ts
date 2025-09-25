@@ -8,8 +8,10 @@ import type {
   Club,
   TeamMatch,
   OpeningStats,
+  ColoredOpeningStats,
   Leaderboards
 } from '@/types/chess'
+import { getOpeningName } from '@/data/ecoMappings'
 
 const CHESS_COM_API_BASE = 'https://api.chess.com/pub'
 
@@ -166,34 +168,47 @@ export class ChessComApiService {
     }
   }
 
-  analyzeOpenings(games: ChessComGame[]): OpeningStats[] {
-    const openingMap = new Map<string, {
+  analyzeOpeningsByColor(games: ChessComGame[], targetUsername: string): ColoredOpeningStats {
+    const whiteOpenings = new Map<string, {
       games: number
       wins: number
       losses: number
       draws: number
       totalRating: number
+      eco?: string
+    }>()
+
+    const blackOpenings = new Map<string, {
+      games: number
+      wins: number
+      losses: number
+      draws: number
+      totalRating: number
+      eco?: string
     }>()
 
     games.forEach(game => {
       if (!game.pgn) return
 
-      const opening = this.extractOpeningFromPGN(game.pgn)
-      if (!opening) return
+      const openingData = this.extractOpeningFromPGN(game.pgn)
+      if (!openingData) return
 
-      const isWhite = game.white.username.toLowerCase()
-      const isPlayer = isWhite || game.black.username.toLowerCase()
-      if (!isPlayer) return
+      const isPlayerWhite = game.white.username.toLowerCase() === targetUsername.toLowerCase()
+      const isPlayerBlack = game.black.username.toLowerCase() === targetUsername.toLowerCase()
 
-      const playerResult = isWhite ? game.white.result : game.black.result
-      const playerRating = isWhite ? game.white.rating : game.black.rating
+      if (!isPlayerWhite && !isPlayerBlack) return
 
-      const current = openingMap.get(opening) || {
+      const playerResult = isPlayerWhite ? game.white.result : game.black.result
+      const playerRating = isPlayerWhite ? game.white.rating : game.black.rating
+      const targetMap = isPlayerWhite ? whiteOpenings : blackOpenings
+
+      const current = targetMap.get(openingData.name) || {
         games: 0,
         wins: 0,
         losses: 0,
         draws: 0,
-        totalRating: 0
+        totalRating: 0,
+        eco: openingData.eco
       }
 
       current.games++
@@ -217,12 +232,108 @@ export class ChessComApiService {
           break
       }
 
-      openingMap.set(opening, current)
+      targetMap.set(openingData.name, current)
+    })
+
+    const processOpenings = (openingMap: typeof whiteOpenings, color: 'white' | 'black'): OpeningStats[] => {
+      return Array.from(openingMap.entries())
+        .map(([opening, stats]) => ({
+          opening,
+          eco: stats.eco,
+          games: stats.games,
+          wins: stats.wins,
+          losses: stats.losses,
+          draws: stats.draws,
+          winRate: stats.games > 0 ? Math.round((stats.wins / stats.games) * 100) : 0,
+          averageRating: stats.games > 0 ? Math.round(stats.totalRating / stats.games) : 0,
+          color
+        }))
+        .filter(stats => stats.games >= 2)
+        .sort((a, b) => b.games - a.games)
+        .slice(0, 15)
+    }
+
+    const whiteStats = processOpenings(whiteOpenings, 'white')
+    const blackStats = processOpenings(blackOpenings, 'black')
+
+    // Combine statistics for overall view
+    const combinedMap = new Map<string, {
+      games: number
+      wins: number
+      losses: number
+      draws: number
+      totalRating: number
+      eco?: string
+    }>()
+
+    // Merge white and black statistics
+    ;[...whiteOpenings, ...blackOpenings].forEach(([opening, stats]) => {
+      const current = combinedMap.get(opening) || {
+        games: 0,
+        wins: 0,
+        losses: 0,
+        draws: 0,
+        totalRating: 0,
+        eco: stats.eco
+      }
+
+      current.games += stats.games
+      current.wins += stats.wins
+      current.losses += stats.losses
+      current.draws += stats.draws
+      current.totalRating += stats.totalRating
+
+      combinedMap.set(opening, current)
+    })
+
+    const combinedStats = processOpenings(combinedMap, 'both')
+
+    return {
+      white: whiteStats,
+      black: blackStats,
+      combined: combinedStats
+    }
+  }
+
+  // Legacy method for backward compatibility
+  analyzeOpenings(games: ChessComGame[], targetUsername?: string): OpeningStats[] {
+    if (targetUsername) {
+      return this.analyzeOpeningsByColor(games, targetUsername).combined
+    }
+
+    // Fallback to old behavior if no username provided
+    const openingMap = new Map<string, {
+      games: number
+      wins: number
+      losses: number
+      draws: number
+      totalRating: number
+      eco?: string
+    }>()
+
+    games.forEach(game => {
+      if (!game.pgn) return
+
+      const openingData = this.extractOpeningFromPGN(game.pgn)
+      if (!openingData) return
+
+      const current = openingMap.get(openingData.name) || {
+        games: 0,
+        wins: 0,
+        losses: 0,
+        draws: 0,
+        totalRating: 0,
+        eco: openingData.eco
+      }
+
+      current.games++
+      openingMap.set(openingData.name, current)
     })
 
     return Array.from(openingMap.entries())
       .map(([opening, stats]) => ({
         opening,
+        eco: stats.eco,
         games: stats.games,
         wins: stats.wins,
         losses: stats.losses,
@@ -235,27 +346,42 @@ export class ChessComApiService {
       .slice(0, 10)
   }
 
-  private extractOpeningFromPGN(pgn: string): string | null {
+  private extractOpeningFromPGN(pgn: string): { name: string; eco?: string } | null {
     const ecoMatch = pgn.match(/\[ECO "([^"]+)"\]/)
     const openingMatch = pgn.match(/\[Opening "([^"]+)"\]/)
+    const variationMatch = pgn.match(/\[Variation "([^"]+)"\]/)
 
-    if (openingMatch) {
-      return openingMatch[1]
-    }
+    let eco: string | undefined
+    let name: string | undefined
 
     if (ecoMatch) {
-      return `ECO ${ecoMatch[1]}`
+      eco = ecoMatch[1]
+      // Use ECO mapping to get proper opening name
+      name = getOpeningName(eco)
     }
 
-    const moves = pgn.split('\n').find(line => !line.startsWith('['))?.trim()
-    if (moves) {
-      const firstMoves = moves.split(' ').slice(0, 6).join(' ')
-      if (firstMoves.length > 0) {
-        return `Opening: ${firstMoves}`
+    if (openingMatch) {
+      name = openingMatch[1]
+      // Add variation if available
+      if (variationMatch && variationMatch[1] !== openingMatch[1]) {
+        name += `: ${variationMatch[1]}`
       }
     }
 
-    return null
+    // Fallback: try to identify opening from first moves
+    if (!name) {
+      const moves = pgn.split('\n').find(line => !line.startsWith('['))?.trim()
+      if (moves) {
+        const firstMoves = moves.split(' ').slice(0, 8).join(' ')
+        if (firstMoves.length > 0) {
+          // Clean up move notation for better readability
+          const cleanMoves = firstMoves.replace(/\d+\./g, '').replace(/\s+/g, ' ').trim()
+          name = `Opening: ${cleanMoves}`
+        }
+      }
+    }
+
+    return name ? { name, eco } : null
   }
 
   async getHistoricalGames(username: string, monthsBack = 6): Promise<ChessComGame[]> {

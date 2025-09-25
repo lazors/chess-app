@@ -120,6 +120,13 @@ export interface OpeningStats {
   draws: number
   winRate: number
   averageRating: number
+  color?: 'white' | 'black' | 'both'
+}
+
+export interface ColoredOpeningStats {
+  white: OpeningStats[]
+  black: OpeningStats[]
+  combined: OpeningStats[]
 }
 
 export interface LeaderboardEntry {
