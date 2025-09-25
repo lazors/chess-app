@@ -238,7 +238,7 @@ export class ChessComApiService {
       targetMap.set(baseOpeningName, current)
     })
 
-    const processOpenings = (openingMap: typeof whiteOpenings, color: 'white' | 'black'): OpeningStats[] => {
+    const processOpenings = (openingMap: typeof whiteOpenings, color: 'white' | 'black' | 'both'): OpeningStats[] => {
       return Array.from(openingMap.entries())
         .map(([opening, stats]) => ({
           opening,
