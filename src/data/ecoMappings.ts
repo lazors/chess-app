@@ -364,6 +364,34 @@ export const OPENING_FAMILIES: Record<string, string> = {
   // King's Indian Attack family
   'King\'s Indian Attack': 'King\'s Indian Attack',
   'King\'s Indian Attack: French Variation': 'King\'s Indian Attack',
+
+  // King's Indian Defense family
+  'King\'s Indian Defense': 'King\'s Indian Defense',
+  'King\'s Indian Defense: Fianchetto Variation': 'King\'s Indian Defense',
+  'King\'s Indian Defense: Fianchetto Variation, Panno Variation': 'King\'s Indian Defense',
+  'King\'s Indian Defense: Fianchetto Variation, Classical Main Line': 'King\'s Indian Defense',
+  'King\'s Indian Defense: Normal Variation': 'King\'s Indian Defense',
+  'King\'s Indian Defense: Makogonov System': 'King\'s Indian Defense',
+  'King\'s Indian Defense: Normal Variation, Deferred Fianchetto': 'King\'s Indian Defense',
+  'King\'s Indian Defense: Averbakh Variation': 'King\'s Indian Defense',
+  'King\'s Indian Defense: Averbakh Variation, Main Line': 'King\'s Indian Defense',
+  'King\'s Indian Defense: Four Pawns Attack': 'King\'s Indian Defense',
+  'King\'s Indian Defense: Four Pawns Attack, Normal Attack': 'King\'s Indian Defense',
+  'King\'s Indian Defense: Four Pawns Attack, Dynamic Attack': 'King\'s Indian Defense',
+  'King\'s Indian Defense: Four Pawns Attack, Main Line': 'King\'s Indian Defense',
+  'King\'s Indian Defense: Sämisch Variation': 'King\'s Indian Defense',
+  'King\'s Indian Defense: Sämisch Variation, Normal Defense': 'King\'s Indian Defense',
+  'King\'s Indian Defense: Sämisch Variation, Panno Main Line': 'King\'s Indian Defense',
+  'King\'s Indian Defense: Sämisch Variation, Orthodox Variation': 'King\'s Indian Defense',
+  'King\'s Indian Defense: Sämisch Variation, Bronstein Defense': 'King\'s Indian Defense',
+  'King\'s Indian Defense: Sämisch Variation, Closed Variation': 'King\'s Indian Defense',
+  'King\'s Indian Defense: Orthodox Variation': 'King\'s Indian Defense',
+  'King\'s Indian Defense: Petrosian Variation': 'King\'s Indian Defense',
+  'King\'s Indian Defense: Orthodox Variation, Main Line': 'King\'s Indian Defense',
+  'King\'s Indian Defense: Orthodox Variation, Mar del Plata Variation': 'King\'s Indian Defense',
+  'King\'s Indian Defense: Orthodox Variation, Bayonet Attack': 'King\'s Indian Defense',
+  'King\'s Indian Defense: Orthodox Variation, Classical System': 'King\'s Indian Defense',
+  'King\'s Indian Defense: Orthodox Variation, Classical System, Main Line': 'King\'s Indian Defense',
 }
 
 export function getBaseOpeningName(openingName: string): string {
