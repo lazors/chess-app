@@ -161,7 +161,7 @@ export const useChessStore = defineStore('chess', () => {
 
     try {
       historicalGames.value = await chessComApi.getHistoricalGames(username, monthsBack)
-      openingStats.value = chessComApi.analyzeOpenings(historicalGames.value)
+      openingStats.value = chessComApi.analyzeOpenings(historicalGames.value, username)
     } catch (err) {
       error.value = err instanceof Error ? err.message : 'Failed to fetch historical games'
       console.error('Error fetching historical games:', err)
