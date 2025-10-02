@@ -621,6 +621,9 @@ export const OPENING_FAMILIES: Record<string, string> = {
   'Bird\'s Opening': 'Bird\'s Opening',
   'Bird\'s Opening: Dutch Variation': 'Bird\'s Opening',
 
+  // London System family
+  'Queen\'s Pawn Game: London System': 'London System',
+
   // Nimzo-Indian Defense family
   'Nimzo-Indian Defense': 'Nimzo-Indian Defense',
   'Nimzo-Indian Defense: Three Knights Variation': 'Nimzo-Indian Defense',
