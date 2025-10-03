@@ -9,6 +9,7 @@ import type {
   TeamMatch,
   OpeningStats,
   ColoredOpeningStats,
+  ColorSeparatedStats,
   Leaderboards
 } from '@/types/chess'
 import { getOpeningName, getBaseOpeningName } from '@/data/ecoMappings'
@@ -295,6 +296,89 @@ export class ChessComApiService {
       white: whiteStats,
       black: blackStats,
       combined: combinedStats
+    }
+  }
+
+  analyzeGamesByColor(games: ChessComGame[], targetUsername: string): ColorSeparatedStats {
+    let whiteStats = {
+      games: 0,
+      wins: 0,
+      losses: 0,
+      draws: 0,
+      totalRating: 0
+    }
+
+    let blackStats = {
+      games: 0,
+      wins: 0,
+      losses: 0,
+      draws: 0,
+      totalRating: 0
+    }
+
+    games.forEach(game => {
+      const isPlayerWhite = game.white.username.toLowerCase() === targetUsername.toLowerCase()
+      const isPlayerBlack = game.black.username.toLowerCase() === targetUsername.toLowerCase()
+
+      if (!isPlayerWhite && !isPlayerBlack) return
+
+      const playerResult = isPlayerWhite ? game.white.result : game.black.result
+      const playerRating = isPlayerWhite ? game.white.rating : game.black.rating
+      const targetStats = isPlayerWhite ? whiteStats : blackStats
+
+      targetStats.games++
+      targetStats.totalRating += playerRating
+
+      switch (playerResult) {
+        case 'win':
+          targetStats.wins++
+          break
+        case 'checkmated':
+        case 'timeout':
+        case 'resigned':
+        case 'abandoned':
+          targetStats.losses++
+          break
+        case 'agreed':
+        case 'stalemate':
+        case 'insufficient':
+        case 'timevsinsufficient':
+          targetStats.draws++
+          break
+      }
+    })
+
+    const processStats = (stats: typeof whiteStats) => ({
+      games: stats.games,
+      wins: stats.wins,
+      losses: stats.losses,
+      draws: stats.draws,
+      winRate: stats.games > 0 ? Math.round((stats.wins / stats.games) * 100) : 0,
+      averageRating: stats.games > 0 ? Math.round(stats.totalRating / stats.games) : 0
+    })
+
+    const processedWhite = processStats(whiteStats)
+    const processedBlack = processStats(blackStats)
+
+    // Calculate combined statistics
+    const combined = {
+      games: processedWhite.games + processedBlack.games,
+      wins: processedWhite.wins + processedBlack.wins,
+      losses: processedWhite.losses + processedBlack.losses,
+      draws: processedWhite.draws + processedBlack.draws,
+      winRate: 0,
+      averageRating: 0
+    }
+
+    if (combined.games > 0) {
+      combined.winRate = Math.round((combined.wins / combined.games) * 100)
+      combined.averageRating = Math.round((whiteStats.totalRating + blackStats.totalRating) / combined.games)
+    }
+
+    return {
+      white: processedWhite,
+      black: processedBlack,
+      combined: combined
     }
   }
 

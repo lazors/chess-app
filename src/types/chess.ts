@@ -129,6 +129,21 @@ export interface ColoredOpeningStats {
   combined: OpeningStats[]
 }
 
+export interface ColorGameStats {
+  games: number
+  wins: number
+  losses: number
+  draws: number
+  winRate: number
+  averageRating: number
+}
+
+export interface ColorSeparatedStats {
+  white: ColorGameStats
+  black: ColorGameStats
+  combined: ColorGameStats
+}
+
 export interface LeaderboardEntry {
   player_id: number
   '@id': string

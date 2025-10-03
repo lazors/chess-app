@@ -8,6 +8,8 @@ import type {
   Club,
   TeamMatch,
   OpeningStats,
+  ColoredOpeningStats,
+  ColorSeparatedStats,
   Leaderboards
 } from '@/types/chess'
 import { chessComApi } from '@/services/chessComApi'
@@ -21,6 +23,8 @@ export const useChessStore = defineStore('chess', () => {
   const clubs = ref<Club[]>([])
   const teamMatches = ref<TeamMatch[]>([])
   const openingStats = ref<OpeningStats[]>([])
+  const coloredOpeningStats = ref<ColoredOpeningStats>({ white: [], black: [], combined: [] })
+  const colorSeparatedStats = ref<ColorSeparatedStats | null>(null)
   const leaderboards = ref<Partial<Leaderboards>>({})
   const loading = ref(false)
   const error = ref<string | null>(null)
@@ -161,7 +165,15 @@ export const useChessStore = defineStore('chess', () => {
 
     try {
       historicalGames.value = await chessComApi.getHistoricalGames(username, monthsBack)
-      openingStats.value = chessComApi.analyzeOpenings(historicalGames.value, username)
+      
+      // Calculate color-separated opening statistics
+      coloredOpeningStats.value = chessComApi.analyzeOpeningsByColor(historicalGames.value, username)
+      
+      // Calculate color-separated overall statistics
+      colorSeparatedStats.value = chessComApi.analyzeGamesByColor(historicalGames.value, username)
+      
+      // Keep backward compatibility
+      openingStats.value = coloredOpeningStats.value.combined
     } catch (err) {
       error.value = err instanceof Error ? err.message : 'Failed to fetch historical games'
       console.error('Error fetching historical games:', err)
@@ -215,6 +227,8 @@ export const useChessStore = defineStore('chess', () => {
     clubs.value = []
     teamMatches.value = []
     openingStats.value = []
+    coloredOpeningStats.value = { white: [], black: [], combined: [] }
+    colorSeparatedStats.value = null
     leaderboards.value = {}
     error.value = null
   }
@@ -229,6 +243,8 @@ export const useChessStore = defineStore('chess', () => {
     clubs,
     teamMatches,
     openingStats,
+    coloredOpeningStats,
+    colorSeparatedStats,
     leaderboards,
     loading,
     error,

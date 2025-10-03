@@ -70,7 +70,7 @@
 
       <!-- Overall Statistics -->
       <div v-if="chessStore.winLossRecord" class="overall-stats">
-        <h2>Overall Statistics</h2>
+        <h2>Overall Statistics (Chess.com API)</h2>
         <div class="stats-summary">
           <div class="stat-item">
             <span class="stat-label">Total Games:</span>
@@ -95,6 +95,105 @@
         </div>
       </div>
 
+      <!-- Color-Separated Game Statistics -->
+      <div v-if="chessStore.colorSeparatedStats" class="color-stats">
+        <h2>Game Statistics by Color</h2>
+        <div class="color-stats-grid">
+          <!-- White Statistics -->
+          <div class="color-section white-section">
+            <h3>🤍 Playing as White</h3>
+            <div class="stats-summary">
+              <div class="stat-item">
+                <span class="stat-label">Games:</span>
+                <span class="stat-value">{{ chessStore.colorSeparatedStats.white.games }}</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-label">Wins:</span>
+                <span class="stat-value win">{{ chessStore.colorSeparatedStats.white.wins }}</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-label">Losses:</span>
+                <span class="stat-value loss">{{ chessStore.colorSeparatedStats.white.losses }}</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-label">Draws:</span>
+                <span class="stat-value draw">{{ chessStore.colorSeparatedStats.white.draws }}</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-label">Win Rate:</span>
+                <span class="stat-value" :class="getWinRateClass(chessStore.colorSeparatedStats.white.winRate)">{{ chessStore.colorSeparatedStats.white.winRate }}%</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-label">Avg Rating:</span>
+                <span class="stat-value">{{ chessStore.colorSeparatedStats.white.averageRating }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Black Statistics -->
+          <div class="color-section black-section">
+            <h3>🖤 Playing as Black</h3>
+            <div class="stats-summary">
+              <div class="stat-item">
+                <span class="stat-label">Games:</span>
+                <span class="stat-value">{{ chessStore.colorSeparatedStats.black.games }}</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-label">Wins:</span>
+                <span class="stat-value win">{{ chessStore.colorSeparatedStats.black.wins }}</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-label">Losses:</span>
+                <span class="stat-value loss">{{ chessStore.colorSeparatedStats.black.losses }}</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-label">Draws:</span>
+                <span class="stat-value draw">{{ chessStore.colorSeparatedStats.black.draws }}</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-label">Win Rate:</span>
+                <span class="stat-value" :class="getWinRateClass(chessStore.colorSeparatedStats.black.winRate)">{{ chessStore.colorSeparatedStats.black.winRate }}%</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-label">Avg Rating:</span>
+                <span class="stat-value">{{ chessStore.colorSeparatedStats.black.averageRating }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Combined Statistics -->
+          <div class="color-section combined-section">
+            <h3>🔄 Combined (Historical Games)</h3>
+            <div class="stats-summary">
+              <div class="stat-item">
+                <span class="stat-label">Games:</span>
+                <span class="stat-value">{{ chessStore.colorSeparatedStats.combined.games }}</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-label">Wins:</span>
+                <span class="stat-value win">{{ chessStore.colorSeparatedStats.combined.wins }}</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-label">Losses:</span>
+                <span class="stat-value loss">{{ chessStore.colorSeparatedStats.combined.losses }}</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-label">Draws:</span>
+                <span class="stat-value draw">{{ chessStore.colorSeparatedStats.combined.draws }}</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-label">Win Rate:</span>
+                <span class="stat-value" :class="getWinRateClass(chessStore.colorSeparatedStats.combined.winRate)">{{ chessStore.colorSeparatedStats.combined.winRate }}%</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-label">Avg Rating:</span>
+                <span class="stat-value">{{ chessStore.colorSeparatedStats.combined.averageRating }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- Tactics Section -->
       <div v-if="chessStore.stats?.tactics" class="tactics-section">
         <h2>Tactics</h2>
@@ -110,14 +209,96 @@
         </div>
       </div>
 
-      <!-- Opening Statistics -->
-      <div v-if="chessStore.openingStats.length > 0" class="openings-section">
-        <h2>Opening Statistics</h2>
-        <div class="openings-grid">
+      <!-- Color-Separated Opening Statistics -->
+      <div v-if="chessStore.coloredOpeningStats && (chessStore.coloredOpeningStats.white.length > 0 || chessStore.coloredOpeningStats.black.length > 0)" class="openings-section">
+        <h2>Opening Statistics by Color</h2>
+        
+        <!-- Opening Tabs -->
+        <div class="opening-tabs">
+          <button 
+            :class="['tab-button', { active: activeOpeningTab === 'white' }]"
+            @click="activeOpeningTab = 'white'"
+          >
+            🤍 White Openings ({{ chessStore.coloredOpeningStats.white.length }})
+          </button>
+          <button 
+            :class="['tab-button', { active: activeOpeningTab === 'black' }]"
+            @click="activeOpeningTab = 'black'"
+          >
+            🖤 Black Openings ({{ chessStore.coloredOpeningStats.black.length }})
+          </button>
+          <button 
+            :class="['tab-button', { active: activeOpeningTab === 'combined' }]"
+            @click="activeOpeningTab = 'combined'"
+          >
+            🔄 Combined ({{ chessStore.coloredOpeningStats.combined.length }})
+          </button>
+        </div>
+
+        <!-- White Openings -->
+        <div v-if="activeOpeningTab === 'white' && chessStore.coloredOpeningStats.white.length > 0" class="openings-grid">
           <div
-            v-for="opening in chessStore.openingStats"
-            :key="opening.opening"
-            class="opening-card"
+            v-for="opening in chessStore.coloredOpeningStats.white"
+            :key="`white-${opening.opening}`"
+            class="opening-card white-opening"
+          >
+            <h3 class="opening-name">{{ opening.opening }}</h3>
+            <div class="opening-stats">
+              <div class="stat-row">
+                <span class="stat-label">Games:</span>
+                <span class="stat-value">{{ opening.games }}</span>
+              </div>
+              <div class="stat-row">
+                <span class="stat-label">Win Rate:</span>
+                <span class="stat-value" :class="getWinRateClass(opening.winRate)">{{ opening.winRate }}%</span>
+              </div>
+              <div class="stat-row">
+                <span class="stat-label">W/L/D:</span>
+                <span class="stat-value">{{ opening.wins }}/{{ opening.losses }}/{{ opening.draws }}</span>
+              </div>
+              <div class="stat-row">
+                <span class="stat-label">Avg Rating:</span>
+                <span class="stat-value">{{ opening.averageRating }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Black Openings -->
+        <div v-if="activeOpeningTab === 'black' && chessStore.coloredOpeningStats.black.length > 0" class="openings-grid">
+          <div
+            v-for="opening in chessStore.coloredOpeningStats.black"
+            :key="`black-${opening.opening}`"
+            class="opening-card black-opening"
+          >
+            <h3 class="opening-name">{{ opening.opening }}</h3>
+            <div class="opening-stats">
+              <div class="stat-row">
+                <span class="stat-label">Games:</span>
+                <span class="stat-value">{{ opening.games }}</span>
+              </div>
+              <div class="stat-row">
+                <span class="stat-label">Win Rate:</span>
+                <span class="stat-value" :class="getWinRateClass(opening.winRate)">{{ opening.winRate }}%</span>
+              </div>
+              <div class="stat-row">
+                <span class="stat-label">W/L/D:</span>
+                <span class="stat-value">{{ opening.wins }}/{{ opening.losses }}/{{ opening.draws }}</span>
+              </div>
+              <div class="stat-row">
+                <span class="stat-label">Avg Rating:</span>
+                <span class="stat-value">{{ opening.averageRating }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Combined Openings -->
+        <div v-if="activeOpeningTab === 'combined' && chessStore.coloredOpeningStats.combined.length > 0" class="openings-grid">
+          <div
+            v-for="opening in chessStore.coloredOpeningStats.combined"
+            :key="`combined-${opening.opening}`"
+            class="opening-card combined-opening"
           >
             <h3 class="opening-name">{{ opening.opening }}</h3>
             <div class="opening-stats">
@@ -213,11 +394,12 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { useChessStore } from '@/stores/chess'
 import RatingCard from '@/components/RatingCard.vue'
 
 const chessStore = useChessStore()
+const activeOpeningTab = ref<'white' | 'black' | 'combined'>('combined')
 
 const winRate = computed(() => {
   const record = chessStore.winLossRecord
@@ -454,6 +636,101 @@ const getWinRateClass = (winRate: number): string => {
 
 .stat-value.poor {
   color: #f44336;
+}
+
+/* Color-separated statistics styles */
+.color-stats {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.color-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+  margin-top: 1rem;
+}
+
+.color-section {
+  background: #f8f9fa;
+  border: 2px solid #e9ecef;
+  border-radius: 8px;
+  padding: 1.5rem;
+  transition: all 0.3s ease;
+}
+
+.color-section:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.white-section {
+  border-color: #d1ecf1;
+  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+}
+
+.black-section {
+  border-color: #d6d8db;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+}
+
+.combined-section {
+  border-color: #b3d4fc;
+  background: linear-gradient(135deg, #e3f2fd 0%, #f0f7ff 100%);
+}
+
+.color-section h3 {
+  margin: 0 0 1rem 0;
+  color: #2c3e50;
+  font-size: 1.2rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Opening tabs styles */
+.opening-tabs {
+  display: flex;
+  gap: 0.5rem;
+  margin: 1rem 0;
+  flex-wrap: wrap;
+}
+
+.tab-button {
+  padding: 0.75rem 1.5rem;
+  border: 2px solid #e9ecef;
+  background: white;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 500;
+  color: #495057;
+}
+
+.tab-button:hover {
+  border-color: #2196F3;
+  color: #2196F3;
+}
+
+.tab-button.active {
+  background: #2196F3;
+  border-color: #2196F3;
+  color: white;
+}
+
+/* Opening card color variants */
+.opening-card.white-opening {
+  border-left: 4px solid #28a745;
+}
+
+.opening-card.black-opening {
+  border-left: 4px solid #6c757d;
+}
+
+.opening-card.combined-opening {
+  border-left: 4px solid #2196F3;
 }
 
 .tournaments-list,
