@@ -397,6 +397,7 @@
 import { computed, ref } from 'vue'
 import { useChessStore } from '@/stores/chess'
 import RatingCard from '@/components/RatingCard.vue'
+import WorstOpenings from '@/components/WorstOpenings.vue'
 
 const chessStore = useChessStore()
 const activeOpeningTab = ref<'white' | 'black' | 'combined'>('combined')
