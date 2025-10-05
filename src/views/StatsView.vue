@@ -209,6 +209,9 @@
         </div>
       </div>
 
+      <!-- Worst Openings Analysis -->
+      <WorstOpenings />
+
       <!-- Color-Separated Opening Statistics -->
       <div v-if="chessStore.coloredOpeningStats && (chessStore.coloredOpeningStats.white.length > 0 || chessStore.coloredOpeningStats.black.length > 0)" class="openings-section">
         <h2>Opening Statistics by Color</h2>
