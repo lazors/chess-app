@@ -25,6 +25,11 @@
       <div class="win-percentage">
         Win Rate: {{ winPercentage }}%
       </div>
+      <div class="win-rate-bar">
+        <div class="bar-segment win-segment" :style="{ width: `${winPercentage}%` }" title="Wins"></div>
+        <div class="bar-segment loss-segment" :style="{ width: `${lossPercentage}%` }" title="Losses"></div>
+        <div class="bar-segment draw-segment" :style="{ width: `${drawPercentage}%` }" title="Draws"></div>
+      </div>
     </div>
   </div>
 </template>
@@ -50,6 +55,16 @@ const totalGames = computed(() => {
 const winPercentage = computed(() => {
   if (!props.record || totalGames.value === 0) return 0
   return Math.round((props.record.win / totalGames.value) * 100)
+})
+
+const lossPercentage = computed(() => {
+  if (!props.record || totalGames.value === 0) return 0
+  return Math.round((props.record.loss / totalGames.value) * 100)
+})
+
+const drawPercentage = computed(() => {
+  if (!props.record || totalGames.value === 0) return 0
+  return Math.round((props.record.draw / totalGames.value) * 100)
 })
 </script>
 
