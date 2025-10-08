@@ -2,8 +2,8 @@
   <div class="recent-form" v-if="recentGames.length > 0">
     <h3>Recent Form (Last {{ displayCount }} Games)</h3>
     <div class="form-indicator">
-      <div 
-        v-for="(game, index) in recentGames.slice(0, displayCount)" 
+      <div
+        v-for="(game, index) in recentGames.slice(0, displayCount)"
         :key="index"
         class="game-result"
         :class="getResultClass(game)"
@@ -23,85 +23,91 @@
       </div>
       <div class="form-stat">
         <span class="label">Recent Win Rate:</span>
-        <span class="value" :class="getWinRateClass(recentWinRate)">{{ recentWinRate }}%</span>
+        <span class="value" :class="getWinRateClass(recentWinRate)"
+          >{{ recentWinRate }}%</span
+        >
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
-import type { ChessComGame } from '@/types/chess'
+import { computed } from 'vue';
+import type { ChessComGame } from '@/types/chess';
 
 interface Props {
-  recentGames: ChessComGame[]
-  username: string
-  displayCount?: number
+  recentGames: ChessComGame[];
+  username: string;
+  displayCount?: number;
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  displayCount: 10
-})
+  displayCount: 10,
+});
 
 const getResultClass = (game: ChessComGame): string => {
-  const username = props.username.toLowerCase()
-  const white = game.white.username.toLowerCase()
-  const black = game.black.username.toLowerCase()
-  
+  const username = props.username.toLowerCase();
+  const white = game.white.username.toLowerCase();
+  const black = game.black.username.toLowerCase();
+
   if (white === username) {
-    if (game.white.result === 'win') return 'win'
-    if (game.black.result === 'win') return 'loss'
-    return 'draw'
+    if (game.white.result === 'win') return 'win';
+    if (game.black.result === 'win') return 'loss';
+    return 'draw';
   } else {
-    if (game.black.result === 'win') return 'win'
-    if (game.white.result === 'win') return 'loss'
-    return 'draw'
+    if (game.black.result === 'win') return 'win';
+    if (game.white.result === 'win') return 'loss';
+    return 'draw';
   }
-}
+};
 
 const getResultIcon = (game: ChessComGame): string => {
-  const result = getResultClass(game)
-  if (result === 'win') return '✓'
-  if (result === 'loss') return '✗'
-  return '='
-}
+  const result = getResultClass(game);
+  if (result === 'win') return '✓';
+  if (result === 'loss') return '✗';
+  return '=';
+};
 
 const getResultTooltip = (game: ChessComGame): string => {
-  const result = getResultClass(game)
-  const date = new Date(game.end_time * 1000).toLocaleDateString()
-  const opponent = game.white.username.toLowerCase() === props.username.toLowerCase() 
-    ? game.black.username 
-    : game.white.username
-  return `${result.toUpperCase()} vs ${opponent} (${date})`
-}
+  const result = getResultClass(game);
+  const date = new Date(game.end_time * 1000).toLocaleDateString();
+  const opponent =
+    game.white.username.toLowerCase() === props.username.toLowerCase()
+      ? game.black.username
+      : game.white.username;
+  return `${result.toUpperCase()} vs ${opponent} (${date})`;
+};
 
 const recentWins = computed(() => {
-  return props.recentGames.slice(0, props.displayCount)
-    .filter(game => getResultClass(game) === 'win').length
-})
+  return props.recentGames
+    .slice(0, props.displayCount)
+    .filter((game) => getResultClass(game) === 'win').length;
+});
 
 const recentLosses = computed(() => {
-  return props.recentGames.slice(0, props.displayCount)
-    .filter(game => getResultClass(game) === 'loss').length
-})
+  return props.recentGames
+    .slice(0, props.displayCount)
+    .filter((game) => getResultClass(game) === 'loss').length;
+});
 
 const recentDraws = computed(() => {
-  return props.recentGames.slice(0, props.displayCount)
-    .filter(game => getResultClass(game) === 'draw').length
-})
+  return props.recentGames
+    .slice(0, props.displayCount)
+    .filter((game) => getResultClass(game) === 'draw').length;
+});
 
 const recentWinRate = computed(() => {
-  const total = props.displayCount
-  if (total === 0) return 0
-  return Math.round((recentWins.value / total) * 100)
-})
+  const total = props.displayCount;
+  if (total === 0) return 0;
+  return Math.round((recentWins.value / total) * 100);
+});
 
 const getWinRateClass = (winRate: number): string => {
-  if (winRate >= 60) return 'excellent'
-  if (winRate >= 50) return 'good'
-  if (winRate >= 40) return 'average'
-  return 'poor'
-}
+  if (winRate >= 60) return 'excellent';
+  if (winRate >= 50) return 'good';
+  if (winRate >= 40) return 'average';
+  return 'poor';
+};
 </script>
 
 <style scoped>
@@ -146,7 +152,7 @@ const getWinRateClass = (winRate: number): string => {
 }
 
 .game-result.win {
-  background: linear-gradient(135deg, #4CAF50 0%, #66BB6A 100%);
+  background: linear-gradient(135deg, #4caf50 0%, #66bb6a 100%);
   color: white;
 }
 
@@ -156,7 +162,7 @@ const getWinRateClass = (winRate: number): string => {
 }
 
 .game-result.draw {
-  background: linear-gradient(135deg, #FF9800 0%, #FFA726 100%);
+  background: linear-gradient(135deg, #ff9800 0%, #ffa726 100%);
   color: white;
 }
 
@@ -193,7 +199,7 @@ const getWinRateClass = (winRate: number): string => {
 }
 
 .form-stat .value .win {
-  color: #4CAF50;
+  color: #4caf50;
 }
 
 .form-stat .value .loss {
@@ -201,19 +207,19 @@ const getWinRateClass = (winRate: number): string => {
 }
 
 .form-stat .value .draw {
-  color: #FF9800;
+  color: #ff9800;
 }
 
 .form-stat .value.excellent {
-  color: #4CAF50;
+  color: #4caf50;
 }
 
 .form-stat .value.good {
-  color: #8BC34A;
+  color: #8bc34a;
 }
 
 .form-stat .value.average {
-  color: #FF9800;
+  color: #ff9800;
 }
 
 .form-stat .value.poor {
@@ -224,13 +230,13 @@ const getWinRateClass = (winRate: number): string => {
   .form-indicator {
     justify-content: center;
   }
-  
+
   .game-result {
     width: 35px;
     height: 35px;
     font-size: 1rem;
   }
-  
+
   .form-stats {
     flex-direction: column;
     gap: 1rem;
