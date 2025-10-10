@@ -80,129 +80,191 @@ const drawPercentage = computed(() => {
 
 <style scoped>
 .rating-card {
-  background: var(--bg-secondary);
-  border-radius: 8px;
-  padding: 1.5rem;
-  box-shadow: 0 2px 8px var(--shadow);
-  border-left: 4px solid;
-  transition:
-    transform 0.2s ease,
-    box-shadow 0.2s ease,
-    background-color 0.3s ease;
+  background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-tertiary) 100%);
+  border-radius: var(--radius-lg);
+  padding: 2rem;
+  box-shadow: var(--shadow-lg);
+  border-left: 6px solid;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid var(--border-color);
+  position: relative;
+  overflow: hidden;
+}
+
+.rating-card::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.rating-card:hover::before {
+  opacity: 1;
 }
 
 .rating-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px var(--shadow);
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: var(--shadow-xl);
 }
 
 .rating-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 1rem;
+  margin-bottom: 1.5rem;
 }
 
 .rating-header h3 {
   margin: 0;
   color: var(--text-primary);
-  font-size: 1.2rem;
+  font-size: 1.4rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
 
 .rating-value {
-  font-size: 2rem;
-  font-weight: bold;
+  font-size: 2.5rem;
+  font-weight: 900;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
 .rating-record {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 0.75rem;
 }
 
 .record-item {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0.25rem 0;
+  padding: 0.75rem 1rem;
+  background: var(--bg-secondary);
+  border-radius: var(--radius-md);
+  transition: all 0.3s ease;
+  border: 1px solid var(--border-color);
+}
+
+.record-item:hover {
+  transform: translateX(4px);
+  box-shadow: var(--shadow-sm);
 }
 
 .record-item.total {
-  border-top: 1px solid var(--border-color);
-  padding-top: 0.5rem;
-  margin-top: 0.25rem;
-  font-weight: 600;
+  border-top: none;
+  padding-top: 0.75rem;
+  margin-top: 0.5rem;
+  font-weight: 700;
+  background: var(--card-gradient);
+  box-shadow: var(--shadow-sm);
 }
 
 .record-label {
   color: var(--text-secondary);
-  font-size: 0.9rem;
-}
-
-.record-value {
+  font-size: 1rem;
   font-weight: 600;
 }
 
+.record-value {
+  font-weight: 700;
+  font-size: 1.2rem;
+}
+
 .record-value.win {
-  color: #4caf50;
+  color: #10b981;
+  text-shadow: 0 0 8px rgba(16, 185, 129, 0.3);
 }
 
 .record-value.loss {
-  color: #f44336;
+  color: #ef4444;
+  text-shadow: 0 0 8px rgba(239, 68, 68, 0.3);
 }
 
 .record-value.draw {
-  color: #ff9800;
+  color: #f59e0b;
+  text-shadow: 0 0 8px rgba(245, 158, 11, 0.3);
 }
 
 .win-percentage {
   text-align: center;
-  padding: 0.5rem;
-  background: var(--bg-tertiary);
-  border-radius: 4px;
-  margin-top: 0.5rem;
-  font-size: 0.9rem;
-  font-weight: 600;
+  padding: 1rem;
+  background: var(--card-gradient);
+  border-radius: var(--radius-md);
+  margin-top: 1rem;
+  font-size: 1.1rem;
+  font-weight: 700;
   color: var(--text-primary);
-  transition: background-color 0.3s ease;
+  transition: all 0.3s ease;
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border-color);
+}
+
+.win-percentage:hover {
+  transform: scale(1.02);
 }
 
 .win-rate-bar {
   display: flex;
   width: 100%;
-  height: 8px;
-  border-radius: 4px;
+  height: 12px;
+  border-radius: var(--radius-md);
   overflow: hidden;
-  margin-top: 0.5rem;
+  margin-top: 1rem;
   background: var(--bg-tertiary);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .bar-segment {
   height: 100%;
-  transition: width 0.3s ease;
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+}
+
+.bar-segment::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.3) 0%, transparent 100%);
 }
 
 .win-segment {
-  background: linear-gradient(90deg, #4caf50 0%, #66bb6a 100%);
+  background: linear-gradient(90deg, #10b981 0%, #059669 100%);
 }
 
 .loss-segment {
-  background: linear-gradient(90deg, #f44336 0%, #ef5350 100%);
+  background: linear-gradient(90deg, #ef4444 0%, #dc2626 100%);
 }
 
 .draw-segment {
-  background: linear-gradient(90deg, #ff9800 0%, #ffa726 100%);
+  background: linear-gradient(90deg, #f59e0b 0%, #d97706 100%);
 }
 
 @media (max-width: 480px) {
+  .rating-card {
+    padding: 1.5rem;
+  }
+
   .rating-header {
     flex-direction: column;
-    gap: 0.5rem;
+    gap: 1rem;
     text-align: center;
   }
 
+  .rating-header h3 {
+    font-size: 1.2rem;
+  }
+
   .rating-value {
-    font-size: 1.5rem;
+    font-size: 2rem;
   }
 }
 </style>
