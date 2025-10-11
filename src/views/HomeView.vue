@@ -14,12 +14,23 @@
 
     <div v-else-if="chessStore.hasProfile" class="status success">
       <div class="user-profile">
-        <img v-if="chessStore.profile?.avatar" :src="chessStore.profile.avatar" alt="User Avatar" class="avatar" />
+        <img
+          v-if="chessStore.profile?.avatar"
+          :src="chessStore.profile.avatar"
+          alt="User Avatar"
+          class="avatar"
+        />
         <div class="user-info">
-          <h2>{{ chessStore.profile?.name || chessStore.profile?.username }}</h2>
+          <h2>
+            {{ chessStore.profile?.name || chessStore.profile?.username }}
+          </h2>
           <p class="username">@{{ chessStore.profile?.username }}</p>
-          <p v-if="chessStore.profile?.title" class="title">{{ chessStore.profile.title }}</p>
-          <p v-if="chessStore.profile?.location" class="location">📍 {{ chessStore.profile.location }}</p>
+          <p v-if="chessStore.profile?.title" class="title">
+            {{ chessStore.profile.title }}
+          </p>
+          <p v-if="chessStore.profile?.location" class="location">
+            📍 {{ chessStore.profile.location }}
+          </p>
         </div>
       </div>
     </div>
@@ -31,11 +42,18 @@
         type="text"
         id="username"
         placeholder="Enter your Chess.com username"
+      />
+      <button
+        @click="fetchUserData"
+        :disabled="!username || chessStore.isLoading"
       >
-      <button @click="fetchUserData" :disabled="!username || chessStore.isLoading">
         {{ chessStore.isLoading ? 'Loading...' : 'Load Data' }}
       </button>
-      <button v-if="chessStore.hasProfile" @click="clearData" class="clear-button">
+      <button
+        v-if="chessStore.hasProfile"
+        @click="clearData"
+        class="clear-button"
+      >
         Clear Data
       </button>
     </div>
@@ -43,22 +61,22 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
-import { useChessStore } from '@/stores/chess'
+import { ref } from 'vue';
+import { useChessStore } from '@/stores/chess';
 
-const username = ref('')
-const chessStore = useChessStore()
+const username = ref('');
+const chessStore = useChessStore();
 
 const fetchUserData = async () => {
   if (username.value) {
-    await chessStore.fetchAllUserData(username.value)
+    await chessStore.fetchAllUserData(username.value);
   }
-}
+};
 
 const clearData = () => {
-  chessStore.clearData()
-  username.value = ''
-}
+  chessStore.clearData();
+  username.value = '';
+};
 </script>
 
 <style scoped>
@@ -233,7 +251,11 @@ const clearData = () => {
 
 .user-input button {
   padding: 1rem 2.5rem;
-  background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
+  background: linear-gradient(
+    135deg,
+    var(--accent-primary) 0%,
+    var(--accent-secondary) 100%
+  );
   color: white;
   border: none;
   border-radius: var(--radius-md);
