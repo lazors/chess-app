@@ -707,7 +707,11 @@ const getWinRateClass = (winRate: number): string => {
 }
 
 .overall-stats {
-  background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-tertiary) 100%);
+  background: linear-gradient(
+    135deg,
+    var(--bg-secondary) 0%,
+    var(--bg-tertiary) 100%
+  );
   padding: 2rem;
   border-radius: var(--radius-xl);
   box-shadow: var(--shadow-lg);
@@ -982,17 +986,29 @@ const getWinRateClass = (winRate: number): string => {
 
 .white-section {
   border-color: #10b981;
-  background: linear-gradient(135deg, var(--bg-secondary) 0%, rgba(16, 185, 129, 0.1) 100%);
+  background: linear-gradient(
+    135deg,
+    var(--bg-secondary) 0%,
+    rgba(16, 185, 129, 0.1) 100%
+  );
 }
 
 .black-section {
   border-color: var(--text-secondary);
-  background: linear-gradient(135deg, var(--bg-secondary) 0%, rgba(100, 116, 139, 0.1) 100%);
+  background: linear-gradient(
+    135deg,
+    var(--bg-secondary) 0%,
+    rgba(100, 116, 139, 0.1) 100%
+  );
 }
 
 .combined-section {
   border-color: #667eea;
-  background: linear-gradient(135deg, var(--bg-secondary) 0%, rgba(102, 126, 234, 0.1) 100%);
+  background: linear-gradient(
+    135deg,
+    var(--bg-secondary) 0%,
+    rgba(102, 126, 234, 0.1) 100%
+  );
 }
 
 .color-section h3 {
@@ -1033,7 +1049,11 @@ const getWinRateClass = (winRate: number): string => {
 }
 
 .tab-button.active {
-  background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
+  background: linear-gradient(
+    135deg,
+    var(--accent-primary) 0%,
+    var(--accent-secondary) 100%
+  );
   border-color: var(--accent-primary);
   color: white;
   box-shadow: var(--shadow);

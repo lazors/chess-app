@@ -64,122 +64,238 @@ const clearData = () => {
 <style scoped>
 .home {
   text-align: center;
-  max-width: 600px;
+  max-width: 700px;
   margin: 0 auto;
+  padding: 2rem;
+}
+
+.home h1 {
+  font-size: 3rem;
+  font-weight: 900;
+  background: var(--bg-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 1rem;
+  letter-spacing: -1px;
+}
+
+.home > p {
+  font-size: 1.2rem;
+  color: var(--text-secondary);
+  margin-bottom: 3rem;
+  font-weight: 500;
 }
 
 .status {
   margin: 2rem 0;
-  padding: 1rem;
-  border-radius: 8px;
+  padding: 2rem;
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-lg);
+  transition: all 0.3s ease;
+}
+
+.status:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-xl);
 }
 
 .status.loading {
   background: var(--loading-bg);
-  border: 1px solid var(--loading-border);
+  border: 2px solid var(--loading-border);
   color: var(--loading-text);
+}
+
+.status.loading p {
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin: 0;
 }
 
 .status.error {
   background: var(--error-bg);
-  border: 1px solid var(--error-border);
+  border: 2px solid var(--error-border);
   color: var(--error-text);
+}
+
+.status.error p {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin: 0;
 }
 
 .status.success {
   background: var(--success-bg);
-  border: 1px solid var(--success-border);
+  border: 2px solid var(--success-border);
 }
 
 .user-profile {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: 2rem;
   justify-content: center;
   text-align: left;
 }
 
 .avatar {
-  width: 80px;
-  height: 80px;
+  width: 100px;
+  height: 100px;
   border-radius: 50%;
   object-fit: cover;
-  border: 3px solid #42b883;
+  border: 5px solid var(--accent-primary);
+  box-shadow: var(--shadow-lg);
+  transition: transform 0.3s ease;
+}
+
+.avatar:hover {
+  transform: scale(1.1) rotate(5deg);
 }
 
 .user-info h2 {
-  margin: 0 0 0.5rem 0;
+  margin: 0 0 0.75rem 0;
   color: var(--text-primary);
+  font-size: 1.8rem;
+  font-weight: 800;
 }
 
 .user-info .username {
-  margin: 0 0 0.25rem 0;
+  margin: 0 0 0.5rem 0;
   color: var(--text-secondary);
-  font-weight: 500;
+  font-weight: 600;
+  font-size: 1.1rem;
 }
 
 .user-info .title {
-  margin: 0 0 0.25rem 0;
+  margin: 0 0 0.5rem 0;
   color: #e67e22;
-  font-weight: bold;
+  font-weight: 700;
+  font-size: 1rem;
+  padding: 0.25rem 0.75rem;
+  background: rgba(230, 126, 34, 0.1);
+  border-radius: var(--radius-md);
+  display: inline-block;
 }
 
 .user-info .location {
   margin: 0;
   color: var(--text-muted);
-  font-size: 0.9rem;
+  font-size: 1rem;
+  font-weight: 500;
 }
 
 .user-input {
-  margin-top: 2rem;
+  margin-top: 3rem;
+  background: var(--bg-secondary);
+  padding: 2.5rem;
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-lg);
+  border: 1px solid var(--border-color);
+  transition: all 0.3s ease;
+}
+
+.user-input:hover {
+  box-shadow: var(--shadow-xl);
 }
 
 .user-input label {
   display: block;
-  margin-bottom: 0.5rem;
+  margin-bottom: 1rem;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  text-align: left;
 }
 
 .user-input input {
-  padding: 0.5rem;
-  margin-right: 1rem;
-  border: 1px solid var(--border-color);
-  border-radius: 4px;
-  background: var(--bg-secondary);
+  width: 100%;
+  padding: 1rem 1.5rem;
+  margin-bottom: 1.5rem;
+  border: 2px solid var(--border-color);
+  border-radius: var(--radius-md);
+  background: var(--bg-primary);
   color: var(--text-primary);
-  transition: border-color 0.3s ease, background-color 0.3s ease;
+  transition: all 0.3s ease;
+  font-size: 1rem;
+  font-weight: 500;
+  box-sizing: border-box;
 }
 
 .user-input input:focus {
   outline: none;
   border-color: var(--accent-primary);
-  box-shadow: 0 0 0 2px var(--input-focus-shadow);
+  box-shadow: var(--input-focus-shadow);
+  transform: translateY(-2px);
+}
+
+.user-input input::placeholder {
+  color: var(--text-muted);
 }
 
 .user-input button {
-  padding: 0.5rem 1rem;
-  background: var(--accent-primary);
+  padding: 1rem 2.5rem;
+  background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
   color: white;
   border: none;
-  border-radius: 4px;
+  border-radius: var(--radius-md);
   cursor: pointer;
-  margin-right: 0.5rem;
-  transition: background-color 0.3s ease;
+  margin: 0.5rem;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  font-weight: 700;
+  font-size: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: var(--shadow);
 }
 
 .user-input button:hover:not(:disabled) {
-  background: var(--accent-secondary);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+.user-input button:active:not(:disabled) {
+  transform: translateY(0);
 }
 
 .user-input button:disabled {
-  background: #ccc;
+  background: var(--text-muted);
   cursor: not-allowed;
+  opacity: 0.6;
+  box-shadow: none;
 }
 
 .clear-button {
-  background: #e74c3c !important;
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%) !important;
 }
 
 .clear-button:hover {
-  background: #c0392b !important;
+  background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%) !important;
+}
+
+@media (max-width: 640px) {
+  .home {
+    padding: 1rem;
+  }
+
+  .home h1 {
+    font-size: 2rem;
+  }
+
+  .user-profile {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .user-info {
+    text-align: center;
+  }
+
+  .user-input {
+    padding: 1.5rem;
+  }
+
+  .user-input button {
+    width: 100%;
+    margin: 0.5rem 0;
+  }
 }
 </style>
