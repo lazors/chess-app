@@ -16,16 +16,16 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted } from 'vue'
-import { RouterLink, RouterView } from 'vue-router'
-import ThemeToggle from '@/components/ThemeToggle.vue'
-import { useThemeStore } from '@/stores/theme'
+import { onMounted } from 'vue';
+import { RouterLink, RouterView } from 'vue-router';
+import ThemeToggle from '@/components/ThemeToggle.vue';
+import { useThemeStore } from '@/stores/theme';
 
-const themeStore = useThemeStore()
+const themeStore = useThemeStore();
 
 onMounted(() => {
-  themeStore.initializeTheme()
-})
+  themeStore.initializeTheme();
+});
 </script>
 
 <style scoped>
