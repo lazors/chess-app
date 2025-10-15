@@ -7,6 +7,7 @@ This document provides guidelines for AI coding agents working on the Chess App 
 **Chess App** is a Vue.js application that integrates with the Chess.com API to display player statistics, game history, and advanced chess analytics.
 
 ### Tech Stack
+
 - **Frontend Framework**: Vue 3 (Composition API)
 - **Language**: TypeScript
 - **Build Tool**: Vite
@@ -73,6 +74,7 @@ chess-app/
    - Use composables for shared logic
 
 3. **Component Structure**
+
    ```vue
    <script setup lang="ts">
    // Imports
@@ -88,7 +90,7 @@ chess-app/
    </template>
 
    <style scoped>
-     /* Component-specific styles */
+   /* Component-specific styles */
    </style>
    ```
 
@@ -188,6 +190,7 @@ pnpm typecheck  # TypeScript type checking
 ## Testing Considerations
 
 When adding or modifying features:
+
 - Test with different Chess.com usernames
 - Handle missing or incomplete data gracefully
 - Test responsive design on various screen sizes
@@ -246,6 +249,7 @@ When adding or modifying features:
 ## Questions or Issues?
 
 When encountering issues:
+
 1. Check this guide first
 2. Review existing code for patterns
 3. Check documentation for libraries used
