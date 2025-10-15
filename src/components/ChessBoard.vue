@@ -1,16 +1,24 @@
 <template>
   <div class="chess-board-container">
-    <div ref="boardElement" class="chess-board"></div>
-    <div v-if="showControls" class="board-controls">
-      <button @click="flipBoard">Flip Board</button>
-      <button @click="resetPosition">Reset</button>
-      <button v-if="pgn" @click="loadPgn">Load Game</button>
+    <div v-if="isLoading" class="loading">
+      Loading chess board...
     </div>
+    <div v-else-if="error" class="error">
+      {{ error }}
+    </div>
+    <template v-else>
+      <div ref="boardElement" class="chess-board"></div>
+      <div v-if="showControls" class="board-controls">
+        <button @click="flipBoard">Flip Board</button>
+        <button @click="resetPosition">Reset</button>
+        <button v-if="pgn" @click="loadPgn">Load Game</button>
+      </div>
+    </template>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, watch } from 'vue'
+import { ref, onMounted, onUnmounted, watch } from 'vue'
 import { Chess } from 'chess.js'
 
 interface Props {
@@ -30,29 +38,55 @@ const props = withDefaults(defineProps<Props>(), {
 const emit = defineEmits<{
   move: [move: { from: string; to: string; promotion?: string }]
   gameEnd: [result: string]
+  error: [error: string]
 }>()
 
 const boardElement = ref<HTMLElement>()
 const game = ref(new Chess())
+const isLoading = ref(true)
+const error = ref<string | null>(null)
 let board: any = null
 
 onMounted(async () => {
-  // Dynamically import chessboard-element
-  const { ChessBoard } = await import('chessboard-element')
+  try {
+    // Dynamically import chessboard-element
+    const { ChessBoard } = await import('chessboard-element')
 
-  if (boardElement.value) {
-    board = new ChessBoard()
-    board.position = props.fen || 'start'
-    board.orientation = props.orientation
-    board.interactive = props.interactive
+    if (boardElement.value) {
+      board = new ChessBoard()
+      board.position = props.fen || 'start'
+      board.orientation = props.orientation
+      board.interactive = props.interactive
 
-    // Set up move validation and handling
-    if (props.interactive) {
-      board.addEventListener('move', handleMove)
-      board.addEventListener('snapend', onSnapEnd)
+      // Set up move validation and handling
+      if (props.interactive) {
+        board.addEventListener('move', handleMove)
+        board.addEventListener('snapend', onSnapEnd)
+      }
+
+      boardElement.value.appendChild(board)
+      isLoading.value = false
     }
+  } catch (err) {
+    const errorMessage = 'Failed to load chess board'
+    error.value = errorMessage
+    emit('error', errorMessage)
+    console.error('Error loading chessboard:', err)
+    isLoading.value = false
+  }
+})
 
-    boardElement.value.appendChild(board)
+onUnmounted(() => {
+  if (board) {
+    // Clean up event listeners
+    if (props.interactive) {
+      board.removeEventListener('move', handleMove)
+      board.removeEventListener('snapend', onSnapEnd)
+    }
+    // Remove board from DOM
+    if (boardElement.value && board.parentNode) {
+      board.parentNode.removeChild(board)
+    }
   }
 })
 
@@ -177,8 +211,31 @@ defineExpose({
   background: #369870;
 }
 
+.loading, .error {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 400px;
+  height: 400px;
+  border: 2px dashed #ccc;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  font-weight: 500;
+}
+
+.loading {
+  color: var(--text-muted, #666);
+  background: var(--bg-subtle, #f9f9f9);
+}
+
+.error {
+  color: var(--error-text, #dc3545);
+  background: var(--error-bg, #f8d7da);
+  border-color: var(--error-border, #f5c6cb);
+}
+
 @media (max-width: 768px) {
-  .chess-board {
+  .chess-board, .loading, .error {
     width: 300px;
     height: 300px;
   }
