@@ -45,23 +45,26 @@ const boardElement = ref<HTMLElement>()
 const game = ref(new Chess())
 const isLoading = ref(true)
 const error = ref<string | null>(null)
+
+// Type-safe board reference using any for chessboard-element (no official types available)
 let board: any = null
 
 onMounted(async () => {
   try {
     // Dynamically import chessboard-element
-    const { ChessBoard } = await import('chessboard-element')
+    await import('chessboard-element')
 
     if (boardElement.value) {
-      board = new ChessBoard()
+      // Create custom element
+      board = document.createElement('chess-board')
       board.position = props.fen || 'start'
       board.orientation = props.orientation
       board.interactive = props.interactive
 
       // Set up move validation and handling
       if (props.interactive) {
-        board.addEventListener('move', handleMove)
-        board.addEventListener('snapend', onSnapEnd)
+        board.addEventListener('move', handleMove as EventListener)
+        board.addEventListener('snapend', onSnapEnd as EventListener)
       }
 
       boardElement.value.appendChild(board)
@@ -78,14 +81,18 @@ onMounted(async () => {
 
 onUnmounted(() => {
   if (board) {
-    // Clean up event listeners
-    if (props.interactive) {
-      board.removeEventListener('move', handleMove)
-      board.removeEventListener('snapend', onSnapEnd)
-    }
-    // Remove board from DOM
-    if (boardElement.value && board.parentNode) {
-      board.parentNode.removeChild(board)
+    try {
+      // Clean up event listeners
+      if (props.interactive) {
+        board.removeEventListener('move', handleMove as EventListener)
+        board.removeEventListener('snapend', onSnapEnd as EventListener)
+      }
+      // Remove board from DOM
+      if (board.parentNode) {
+        board.parentNode.removeChild(board)
+      }
+    } catch (err) {
+      console.warn('Error during board cleanup:', err)
     }
   }
 })
@@ -113,16 +120,22 @@ const handleMove = (event: CustomEvent) => {
       }
     } else {
       // Invalid move, snap back
-      board.position = game.value.fen()
+      if (board) {
+        board.position = game.value.fen()
+      }
     }
   } catch (error) {
     // Invalid move, snap back
-    board.position = game.value.fen()
+    if (board) {
+      board.position = game.value.fen()
+    }
   }
 }
 
 const onSnapEnd = () => {
-  board.position = game.value.fen()
+  if (board) {
+    board.position = game.value.fen()
+  }
 }
 
 const flipBoard = () => {
