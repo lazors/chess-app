@@ -13,13 +13,14 @@ import type {
   Leaderboards
 } from '@/types/chess'
 import { getOpeningName, getBaseOpeningName } from '@/data/ecoMappings'
+import { API_CONFIG, CHESS_CONFIG } from '@/constants/api'
 
-const CHESS_COM_API_BASE = 'https://api.chess.com/pub'
+const CHESS_COM_API_BASE = import.meta.env.VITE_CHESS_API_BASE || API_CONFIG.BASE_URL
 
 export class ChessComApiService {
   private axiosInstance = axios.create({
     baseURL: CHESS_COM_API_BASE,
-    timeout: 10000,
+    timeout: API_CONFIG.TIMEOUT,
   })
 
   async getUserProfile(username: string): Promise<ChessComProfile> {
@@ -260,35 +261,25 @@ export class ChessComApiService {
     const whiteStats = processOpenings(whiteOpenings, 'white')
     const blackStats = processOpenings(blackOpenings, 'black')
 
-    // Combine statistics for overall view
-    const combinedMap = new Map<string, {
-      games: number
-      wins: number
-      losses: number
-      draws: number
-      totalRating: number
-      eco?: string
-    }>()
-
-    // Merge white and black statistics
-    ;[...whiteOpenings, ...blackOpenings].forEach(([opening, stats]) => {
-      const current = combinedMap.get(opening) || {
-        games: 0,
-        wins: 0,
-        losses: 0,
-        draws: 0,
-        totalRating: 0,
-        eco: stats.eco
+    // Combine statistics for overall view - OPTIMIZED
+    const combinedMap = new Map(whiteOpenings)
+    
+    // Merge black statistics into combined map
+    for (const [opening, stats] of blackOpenings) {
+      const current = combinedMap.get(opening)
+      
+      if (current) {
+        // Opening exists in both colors, merge stats
+        current.games += stats.games
+        current.wins += stats.wins
+        current.losses += stats.losses
+        current.draws += stats.draws
+        current.totalRating += stats.totalRating
+      } else {
+        // Opening only exists as black, add it
+        combinedMap.set(opening, { ...stats })
       }
-
-      current.games += stats.games
-      current.wins += stats.wins
-      current.losses += stats.losses
-      current.draws += stats.draws
-      current.totalRating += stats.totalRating
-
-      combinedMap.set(opening, current)
-    })
+    }
 
     const combinedStats = processOpenings(combinedMap, 'both')
 
