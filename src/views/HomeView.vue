@@ -65,10 +65,36 @@ import { ref } from 'vue';
 import { useChessStore } from '@/stores/chess';
 
 const username = ref('');
+const usernameError = ref<string | null>(null);
 const chessStore = useChessStore();
 
+const validateUsername = (username: string): boolean => {
+  // Clear previous errors
+  usernameError.value = null;
+
+  // Check minimum length
+  if (!username || username.length < 3) {
+    usernameError.value = 'Username must be at least 3 characters';
+    return false;
+  }
+
+  // Check maximum length
+  if (username.length > 25) {
+    usernameError.value = 'Username must not exceed 25 characters';
+    return false;
+  }
+
+  // Check valid characters (alphanumeric, underscore, hyphen)
+  if (!/^[a-zA-Z0-9_-]+$/.test(username)) {
+    usernameError.value = 'Username can only contain letters, numbers, underscores, and hyphens';
+    return false;
+  }
+
+  return true;
+};
+
 const fetchUserData = async () => {
-  if (username.value) {
+  if (username.value && validateUsername(username.value)) {
     await chessStore.fetchAllUserData(username.value);
   }
 };
@@ -76,6 +102,7 @@ const fetchUserData = async () => {
 const clearData = () => {
   chessStore.clearData();
   username.value = '';
+  usernameError.value = null;
 };
 </script>
 
