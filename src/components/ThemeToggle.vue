@@ -3,8 +3,12 @@
     @click="themeStore.toggleTheme()"
     class="theme-toggle"
     :title="themeStore.isDark ? 'Switch to light theme' : 'Switch to dark theme'"
+    :aria-label="themeStore.isDark ? 'Switch to light theme' : 'Switch to dark theme'"
+    :aria-pressed="themeStore.isDark"
+    role="switch"
+    type="button"
   >
-    <span class="theme-icon">
+    <span class="theme-icon" aria-hidden="true">
       {{ themeStore.isDark ? '☀️' : '🌙' }}
     </span>
     <span class="theme-text">
