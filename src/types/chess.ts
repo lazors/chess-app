@@ -11,6 +11,7 @@ export interface ChessComProfile {
   name?: string
   avatar?: string
   location?: string
+  title?: string
   is_streamer?: boolean
   twitch_url?: string
 }
