@@ -42,10 +42,16 @@
         type="text"
         id="username"
         placeholder="Enter your Chess.com username"
+        :class="{ 'input-error': usernameError }"
+        @input="usernameError = null"
       />
+      <p v-if="usernameError" class="error-message" role="alert" aria-live="polite">{{ usernameError }}</p>
       <button
         @click="fetchUserData"
         :disabled="!username || chessStore.isLoading"
+        :aria-busy="chessStore.isLoading"
+        aria-label="Load user data from Chess.com"
+        type="button"
       >
         {{ chessStore.isLoading ? 'Loading...' : 'Load Data' }}
       </button>
@@ -53,6 +59,8 @@
         v-if="chessStore.hasProfile"
         @click="clearData"
         class="clear-button"
+        aria-label="Clear all loaded user data"
+        type="button"
       >
         Clear Data
       </button>
@@ -63,6 +71,7 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { useChessStore } from '@/stores/chess';
+import { VALIDATION } from '@/constants/api';
 
 const username = ref('');
 const usernameError = ref<string | null>(null);
@@ -73,19 +82,19 @@ const validateUsername = (username: string): boolean => {
   usernameError.value = null;
 
   // Check minimum length
-  if (!username || username.length < 3) {
-    usernameError.value = 'Username must be at least 3 characters';
+  if (!username || username.length < VALIDATION.USERNAME_MIN_LENGTH) {
+    usernameError.value = `Username must be at least ${VALIDATION.USERNAME_MIN_LENGTH} characters`;
     return false;
   }
 
   // Check maximum length
-  if (username.length > 25) {
-    usernameError.value = 'Username must not exceed 25 characters';
+  if (username.length > VALIDATION.USERNAME_MAX_LENGTH) {
+    usernameError.value = `Username must not exceed ${VALIDATION.USERNAME_MAX_LENGTH} characters`;
     return false;
   }
 
   // Check valid characters (alphanumeric, underscore, hyphen)
-  if (!/^[a-zA-Z0-9_-]+$/.test(username)) {
+  if (!VALIDATION.USERNAME_PATTERN.test(username)) {
     usernameError.value = 'Username can only contain letters, numbers, underscores, and hyphens';
     return false;
   }
@@ -274,6 +283,23 @@ const clearData = () => {
 
 .user-input input::placeholder {
   color: var(--text-muted);
+}
+
+.user-input input.input-error {
+  border-color: #ef4444;
+  background: rgba(239, 68, 68, 0.05);
+}
+
+.error-message {
+  color: #ef4444;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-align: left;
+  margin: -1rem 0 1rem 0;
+  padding: 0.5rem;
+  background: rgba(239, 68, 68, 0.1);
+  border-radius: var(--radius-sm);
+  border-left: 3px solid #ef4444;
 }
 
 .user-input button {
