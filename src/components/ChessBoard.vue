@@ -7,11 +7,30 @@
       {{ error }}
     </div>
     <template v-else>
-      <div ref="boardElement" class="chess-board"></div>
-      <div v-if="showControls" class="board-controls">
-        <button @click="flipBoard">Flip Board</button>
-        <button @click="resetPosition">Reset</button>
-        <button v-if="pgn" @click="loadPgn">Load Game</button>
+      <div ref="boardElement" class="chess-board" role="application" aria-label="Chess board"></div>
+      <div v-if="showControls" class="board-controls" role="toolbar" aria-label="Chess board controls">
+        <button 
+          @click="flipBoard" 
+          aria-label="Flip chess board orientation"
+          type="button"
+        >
+          Flip Board
+        </button>
+        <button 
+          @click="resetPosition" 
+          aria-label="Reset board to starting position"
+          type="button"
+        >
+          Reset
+        </button>
+        <button 
+          v-if="pgn" 
+          @click="loadPgn"
+          aria-label="Load game from PGN notation"
+          type="button"
+        >
+          Load Game
+        </button>
       </div>
     </template>
   </div>

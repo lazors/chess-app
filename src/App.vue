@@ -1,15 +1,15 @@
 <template>
   <div id="app">
-    <nav>
-      <div class="nav-links">
-        <RouterLink to="/">Home</RouterLink>
-        <RouterLink to="/games">Games</RouterLink>
-        <RouterLink to="/stats">Statistics</RouterLink>
-        <RouterLink to="/leaderboards">Leaderboards</RouterLink>
+    <nav role="navigation" aria-label="Main navigation">
+      <div class="nav-links" role="list">
+        <RouterLink to="/" role="listitem" aria-label="Navigate to Home page">Home</RouterLink>
+        <RouterLink to="/games" role="listitem" aria-label="Navigate to Games page">Games</RouterLink>
+        <RouterLink to="/stats" role="listitem" aria-label="Navigate to Statistics page">Statistics</RouterLink>
+        <RouterLink to="/leaderboards" role="listitem" aria-label="Navigate to Leaderboards page">Leaderboards</RouterLink>
       </div>
       <ThemeToggle />
     </nav>
-    <main>
+    <main role="main" aria-label="Main content">
       <RouterView />
     </main>
   </div>
