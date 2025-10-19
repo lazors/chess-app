@@ -253,9 +253,9 @@ export class ChessComApiService {
           averageRating: stats.games > 0 ? Math.round(stats.totalRating / stats.games) : 0,
           color
         }))
-        .filter(stats => stats.games >= 2)
+        .filter(stats => stats.games >= CHESS_CONFIG.MIN_GAMES_FOR_OPENING_STAT)
         .sort((a, b) => b.games - a.games)
-        .slice(0, 15)
+        .slice(0, CHESS_CONFIG.MAX_OPENING_RESULTS)
     }
 
     const whiteStats = processOpenings(whiteOpenings, 'white')
