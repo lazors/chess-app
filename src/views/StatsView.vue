@@ -283,6 +283,14 @@
       <!-- Worst Openings Analysis -->
       <WorstOpenings />
 
+      <!-- Best Games Analysis -->
+      <BestGames 
+        v-if="chessStore.profile?.username"
+        :username="chessStore.profile.username"
+        :auto-load="false"
+        :limit="5"
+      />
+
       <!-- Recent Form Indicator -->
       <RecentForm
         v-if="chessStore.recentGames.length > 0"
@@ -546,6 +554,7 @@ import { useChessStore } from '@/stores/chess';
 import RatingCard from '@/components/RatingCard.vue';
 import WorstOpenings from '@/components/WorstOpenings.vue';
 import RecentForm from '@/components/RecentForm.vue';
+import BestGames from '@/components/BestGames.vue';
 
 const chessStore = useChessStore();
 const activeOpeningTab = ref<'white' | 'black' | 'combined'>('combined');
