@@ -10,7 +10,8 @@ import type {
   OpeningStats,
   ColoredOpeningStats,
   ColorSeparatedStats,
-  Leaderboards
+  Leaderboards,
+  BestGame
 } from '@/types/chess'
 import { getOpeningName, getBaseOpeningName } from '@/data/ecoMappings'
 import { API_CONFIG, CHESS_CONFIG } from '@/constants/api'
@@ -485,6 +486,120 @@ export class ChessComApiService {
     } catch (error) {
       console.error('Error fetching historical games:', error)
       throw new Error(`Failed to fetch historical games for user: ${username}`)
+    }
+  }
+
+  /**
+   * Analyzes games to find the best performances based on multiple criteria
+   * @param games Array of games to analyze
+   * @param targetUsername Username to analyze games for
+   * @param limit Maximum number of best games to return
+   * @returns Array of best games with analysis data
+   */
+  analyzeBestGames(games: ChessComGame[], targetUsername: string, limit = 10): BestGame[] {
+    const bestGames: BestGame[] = []
+
+    games.forEach(game => {
+      // Skip games without accuracy data or if player is not in the game
+      if (!game.accuracies) return
+
+      const isPlayerWhite = game.white.username.toLowerCase() === targetUsername.toLowerCase()
+      const isPlayerBlack = game.black.username.toLowerCase() === targetUsername.toLowerCase()
+      
+      if (!isPlayerWhite && !isPlayerBlack) return
+
+      const playerColor = isPlayerWhite ? 'white' : 'black'
+      const playerData = isPlayerWhite ? game.white : game.black
+      const opponentData = isPlayerWhite ? game.black : game.white
+      const playerAccuracy = isPlayerWhite ? game.accuracies.white : game.accuracies.black
+      const opponentAccuracy = isPlayerWhite ? game.accuracies.black : game.accuracies.white
+
+      // Determine result from player's perspective
+      let result: 'win' | 'draw' | 'loss'
+      switch (playerData.result) {
+        case 'win':
+          result = 'win'
+          break
+        case 'agreed':
+        case 'stalemate':
+        case 'insufficient':
+        case 'timevsinsufficient':
+          result = 'draw'
+          break
+        default:
+          result = 'loss'
+          break
+      }
+
+      const ratingDifference = playerData.rating - opponentData.rating
+
+      // Calculate game score based on multiple factors
+      let gameScore = 0
+
+      // Base score from result (0-100 points)
+      if (result === 'win') gameScore += 100
+      else if (result === 'draw') gameScore += 50
+      else gameScore += 0
+
+      // Accuracy bonus (0-50 points)
+      gameScore += (playerAccuracy / 100) * 50
+
+      // Rating difference bonus/penalty (-25 to +25 points)
+      if (ratingDifference < 0) {
+        // Playing higher rated opponent - bonus for good performance
+        gameScore += Math.min(Math.abs(ratingDifference) / 20, 25)
+      } else {
+        // Playing lower rated opponent - small penalty
+        gameScore -= Math.min(ratingDifference / 40, 10)
+      }
+
+      // Accuracy relative to opponent bonus (0-25 points)
+      const accuracyDifference = playerAccuracy - opponentAccuracy
+      gameScore += (accuracyDifference / 100) * 25
+
+      // Time class multiplier (longer games generally more meaningful)
+      const timeClassMultiplier = {
+        'bullet': 0.9,
+        'blitz': 1.0,
+        'rapid': 1.1,
+        'daily': 1.2
+      }
+      gameScore *= timeClassMultiplier[game.time_class] || 1.0
+
+      bestGames.push({
+        game,
+        playerColor,
+        playerRating: playerData.rating,
+        opponentRating: opponentData.rating,
+        playerAccuracy,
+        opponentAccuracy,
+        ratingDifference,
+        gameScore,
+        result
+      })
+    })
+
+    // Sort by game score (highest first) and return top games
+    return bestGames
+      .filter(bestGame => bestGame.playerAccuracy >= 70) // Only include games with decent accuracy
+      .sort((a, b) => b.gameScore - a.gameScore)
+      .slice(0, limit)
+  }
+
+  /**
+   * Gets best games for a user by analyzing their historical games
+   * @param username Username to get best games for
+   * @param monthsBack Number of months to look back
+   * @param limit Maximum number of best games to return
+   * @returns Array of best games
+   */
+  async getBestGames(username: string, monthsBack = 6, limit = 10): Promise<BestGame[]> {
+    try {
+      const historicalGames = await this.getHistoricalGames(username, monthsBack)
+      return this.analyzeBestGames(historicalGames, username, limit)
+    } catch (error) {
+      console.error('Error fetching best games:', error)
+      throw new Error(`Failed to fetch best games for user: ${username}`)
     }
   }
 }
