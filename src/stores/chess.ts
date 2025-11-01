@@ -10,7 +10,8 @@ import type {
   OpeningStats,
   ColoredOpeningStats,
   ColorSeparatedStats,
-  Leaderboards
+  Leaderboards,
+  BestGame
 } from '@/types/chess'
 import { chessComApi } from '@/services/chessComApi'
 
@@ -19,6 +20,7 @@ export const useChessStore = defineStore('chess', () => {
   const stats = ref<ChessComStats | null>(null)
   const recentGames = ref<ChessComGame[]>([])
   const historicalGames = ref<ChessComGame[]>([])
+  const bestGames = ref<BestGame[]>([])
   const tournaments = ref<Tournament[]>([])
   const clubs = ref<Club[]>([])
   const teamMatches = ref<TeamMatch[]>([])
@@ -182,6 +184,20 @@ export const useChessStore = defineStore('chess', () => {
     }
   }
 
+  async function fetchBestGames(username: string, monthsBack = 6, limit = 10) {
+    loading.value = true
+    error.value = null
+
+    try {
+      bestGames.value = await chessComApi.getBestGames(username, monthsBack, limit)
+    } catch (err) {
+      error.value = err instanceof Error ? err.message : 'Failed to fetch best games'
+      console.error('Error fetching best games:', err)
+    } finally {
+      loading.value = false
+    }
+  }
+
   async function fetchLeaderboards() {
     loading.value = true
     error.value = null
@@ -206,6 +222,7 @@ export const useChessStore = defineStore('chess', () => {
         fetchUserStats(username),
         fetchRecentGames(username),
         fetchHistoricalGames(username, 6),
+        fetchBestGames(username, 6, 5),
         fetchTournaments(username),
         fetchClubs(username),
         fetchTeamMatches(username)
@@ -223,6 +240,7 @@ export const useChessStore = defineStore('chess', () => {
     stats.value = null
     recentGames.value = []
     historicalGames.value = []
+    bestGames.value = []
     tournaments.value = []
     clubs.value = []
     teamMatches.value = []
@@ -239,6 +257,7 @@ export const useChessStore = defineStore('chess', () => {
     stats,
     recentGames,
     historicalGames,
+    bestGames,
     tournaments,
     clubs,
     teamMatches,
@@ -264,6 +283,7 @@ export const useChessStore = defineStore('chess', () => {
     fetchUserStats,
     fetchRecentGames,
     fetchHistoricalGames,
+    fetchBestGames,
     fetchTournaments,
     fetchClubs,
     fetchTeamMatches,
