@@ -73,6 +73,18 @@ export interface PlayerGame {
   uuid: string
 }
 
+export interface BestGame {
+  game: ChessComGame
+  playerColor: 'white' | 'black'
+  playerRating: number
+  opponentRating: number
+  playerAccuracy: number
+  opponentAccuracy: number
+  ratingDifference: number
+  gameScore: number // Combined score based on rating difference, accuracy, and result
+  result: 'win' | 'draw' | 'loss'
+}
+
 export interface GameArchive {
   archives: string[]
 }
