@@ -69,9 +69,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
-import { useChessStore } from '@/stores/chess';
-import { VALIDATION } from '@/constants/api';
+import { ref } from 'vue'
+import { useChessStore } from '@/stores/chess'
+import { VALIDATION } from '@/constants/api'
 
 const username = ref('');
 const usernameError = ref<string | null>(null);
