@@ -110,7 +110,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted } from 'vue'
+import { computed, onMounted, onUnmounted } from 'vue'
 import { useChessStore } from '@/stores/chess'
 import { formatShortDate } from '@/utils/date'
 import type { BestGame } from '@/types/chess'
@@ -142,9 +142,19 @@ const loadMoreGames = async () => {
   }
 }
 
+let cleanupTimeout: number | null = null
+
 onMounted(() => {
   if (props.autoLoad && props.username) {
     chessStore.fetchBestGames(props.username, 6, props.limit)
+  }
+})
+
+onUnmounted(() => {
+  // Clean up any pending timeouts
+  if (cleanupTimeout) {
+    clearTimeout(cleanupTimeout)
+    cleanupTimeout = null
   }
 })
 </script>

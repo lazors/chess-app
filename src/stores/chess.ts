@@ -25,11 +25,41 @@ export const useChessStore = defineStore('chess', () => {
   const clubs = ref<Club[]>([])
   const teamMatches = ref<TeamMatch[]>([])
   const openingStats = ref<OpeningStats[]>([])
-  const coloredOpeningStats = ref<ColoredOpeningStats>({ white: [], black: [], combined: [] })
-  const colorSeparatedStats = ref<ColorSeparatedStats | null>(null)
+  const coloredOpeningStats = ref<ColoredOpeningStats>({
+    white: [],
+    black: [],
+    combined: []
+  })
+  const colorSeparatedStats = ref<ColorSeparatedStats>({
+    white: { games: 0, wins: 0, losses: 0, draws: 0, winRate: 0, averageRating: 0 },
+    black: { games: 0, wins: 0, losses: 0, draws: 0, winRate: 0, averageRating: 0 },
+    combined: { games: 0, wins: 0, losses: 0, draws: 0, winRate: 0, averageRating: 0 }
+  })
   const leaderboards = ref<Partial<Leaderboards>>({})
   const loading = ref(false)
   const error = ref<string | null>(null)
+
+  // Error handling wrapper to reduce code duplication
+  async function withErrorHandling<T>(
+    operation: () => Promise<T>,
+    errorMessage: string,
+    setLoadingState = true
+  ): Promise<T | null> {
+    if (setLoadingState) loading.value = true
+    error.value = null
+
+    try {
+      const result = await operation()
+      return result
+    } catch (err) {
+      const finalErrorMessage = err instanceof Error ? err.message : errorMessage
+      error.value = finalErrorMessage
+      console.error(errorMessage, err)
+      return null
+    } finally {
+      if (setLoadingState) loading.value = false
+    }
+  }
 
   const isLoading = computed(() => loading.value)
   const hasError = computed(() => error.value !== null)
@@ -217,12 +247,28 @@ export const useChessStore = defineStore('chess', () => {
     error.value = null
 
     try {
+      // Rate-limited API calls to prevent exceeding Chess.com API limits
+      // Phase 1: Core user data
       await Promise.allSettled([
         fetchUserProfile(username),
-        fetchUserStats(username),
+        fetchUserStats(username)
+      ])
+      
+      // Small delay to respect rate limits
+      await new Promise(resolve => setTimeout(resolve, 100))
+      
+      // Phase 2: Game data (more intensive calls)
+      await Promise.allSettled([
         fetchRecentGames(username),
         fetchHistoricalGames(username, 6),
-        fetchBestGames(username, 6, 5),
+        fetchBestGames(username, 6, 5)
+      ])
+      
+      // Small delay to respect rate limits
+      await new Promise(resolve => setTimeout(resolve, 100))
+      
+      // Phase 3: Community data
+      await Promise.allSettled([
         fetchTournaments(username),
         fetchClubs(username),
         fetchTeamMatches(username)
@@ -246,7 +292,11 @@ export const useChessStore = defineStore('chess', () => {
     teamMatches.value = []
     openingStats.value = []
     coloredOpeningStats.value = { white: [], black: [], combined: [] }
-    colorSeparatedStats.value = null
+    colorSeparatedStats.value = {
+      white: { games: 0, wins: 0, losses: 0, draws: 0, winRate: 0, averageRating: 0 },
+      black: { games: 0, wins: 0, losses: 0, draws: 0, winRate: 0, averageRating: 0 },
+      combined: { games: 0, wins: 0, losses: 0, draws: 0, winRate: 0, averageRating: 0 }
+    }
     leaderboards.value = {}
     error.value = null
   }

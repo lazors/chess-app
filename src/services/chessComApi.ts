@@ -500,13 +500,18 @@ export class ChessComApiService {
     const bestGames: BestGame[] = []
 
     games.forEach(game => {
-      // Skip games without accuracy data or if player is not in the game
-      if (!game.accuracies) return
-
       const isPlayerWhite = game.white.username.toLowerCase() === targetUsername.toLowerCase()
       const isPlayerBlack = game.black.username.toLowerCase() === targetUsername.toLowerCase()
       
       if (!isPlayerWhite && !isPlayerBlack) return
+
+      // Skip games without accuracy data - validate properly
+      if (!game.accuracies || 
+          typeof game.accuracies.white !== 'number' || 
+          typeof game.accuracies.black !== 'number') {
+        console.warn(`Skipping game without valid accuracy data: ${game.url}`)
+        return
+      }
 
       const playerColor = isPlayerWhite ? 'white' : 'black'
       const playerData = isPlayerWhite ? game.white : game.black
