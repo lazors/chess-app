@@ -110,6 +110,9 @@ export const ECO_MAPPINGS: Record<string, ECOOpening> = {
   // B00-B99: Semi-Open Games other than the French Defense
   'B00': { code: 'B00', name: 'King\'s Pawn Game', moves: '1.e4' },
   'B01': { code: 'B01', name: 'Scandinavian Defense', moves: '1.e4 d5' },
+  'B01a': { code: 'B01', name: 'Scandinavian Defense: Modern Variation', moves: '1.e4 d5 2.exd5 Nf6' },
+  'B01b': { code: 'B01', name: 'Scandinavian Defense: Main Line', moves: '1.e4 d5 2.exd5 Qxd5' },
+  'B01c': { code: 'B01', name: 'Scandinavian Defense: Mieses-Kotrč Variation', moves: '1.e4 d5 2.exd5 Qxd5 3.Nc3 Qa5' },
   'B02': { code: 'B02', name: 'Alekhine\'s Defense', moves: '1.e4 Nf6' },
   'B03': { code: 'B03', name: 'Alekhine\'s Defense: Four Pawns Attack', moves: '1.e4 Nf6 2.e5 Nd5 3.d4' },
   'B04': { code: 'B04', name: 'Alekhine\'s Defense: Modern Variation', moves: '1.e4 Nf6 2.e5 Nd5 3.d4 d6' },
@@ -315,6 +318,10 @@ export const ECO_MAPPINGS: Record<string, ECOOpening> = {
   'D00': { code: 'D00', name: 'Queen\'s Pawn Game', moves: '1.d4' },
   'D01': { code: 'D01', name: 'Richter-Veresov Attack', moves: '1.d4 Nf6 2.Nc3' },
   'D02': { code: 'D02', name: 'Queen\'s Pawn Game: London System', moves: '1.d4 d5 2.Nf3 Nf6 3.Bf4' },
+  'D02a': { code: 'D02', name: 'London System: Traditional', moves: '1.d4 d5 2.Bf4' },
+  'D02b': { code: 'D02', name: 'London System: Accelerated', moves: '1.d4 Nf6 2.Bf4' },
+  'D02c': { code: 'D02', name: 'London System vs King\'s Indian Defense', moves: '1.d4 Nf6 2.Bf4 g6 3.Nf3 Bg7' },
+  'D02d': { code: 'D02', name: 'London System vs French Defense', moves: '1.d4 e6 2.Bf4' },
   'D03': { code: 'D03', name: 'Torre Attack', moves: '1.d4 Nf6 2.Nf3 e6 3.Bg5' },
   'D04': { code: 'D04', name: 'Queen\'s Pawn Game: Colle System', moves: '1.d4 Nf6 2.Nf3 e6 3.e3' },
   'D05': { code: 'D05', name: 'Queen\'s Pawn Game: Colle System', moves: '1.d4 Nf6 2.Nf3 e6 3.e3 c5' },
@@ -522,11 +529,49 @@ export function getOpeningName(ecoCode: string): string {
 }
 
 export function getOpeningByMoves(moves: string): ECOOpening | null {
+  // Clean moves string for better matching
+  const cleanMoves = moves.replace(/\d+\./g, '').replace(/\s+/g, ' ').trim().toLowerCase()
+
+  // Enhanced pattern matching for specific openings
+  
+  // London System patterns
+  if (cleanMoves.match(/^(d4.*bf4|bf4.*d4)/)) {
+    if (cleanMoves.includes('nf6') && cleanMoves.includes('g6') && cleanMoves.includes('bg7')) {
+      return { code: 'D02c', name: 'London System vs King\'s Indian Defense', moves: '1.d4 Nf6 2.Bf4 g6 3.Nf3 Bg7' }
+    }
+    if (cleanMoves.includes('e6') && !cleanMoves.includes('nf6')) {
+      return { code: 'D02d', name: 'London System vs French Defense', moves: '1.d4 e6 2.Bf4' }
+    }
+    if (cleanMoves.startsWith('d4 nf6') && cleanMoves.includes('bf4')) {
+      return { code: 'D02b', name: 'London System: Accelerated', moves: '1.d4 Nf6 2.Bf4' }
+    }
+    if (cleanMoves.startsWith('d4 d5') && cleanMoves.includes('bf4')) {
+      return { code: 'D02a', name: 'London System: Traditional', moves: '1.d4 d5 2.Bf4' }
+    }
+    return { code: 'D02', name: 'Queen\'s Pawn Game: London System', moves: '1.d4 d5 2.Nf3 Nf6 3.Bf4' }
+  }
+
+  // Scandinavian Defense patterns
+  if (cleanMoves.startsWith('e4 d5')) {
+    if (cleanMoves.includes('exd5 nf6')) {
+      return { code: 'B01a', name: 'Scandinavian Defense: Modern Variation', moves: '1.e4 d5 2.exd5 Nf6' }
+    }
+    if (cleanMoves.includes('exd5 qxd5')) {
+      if (cleanMoves.includes('nc3 qa5')) {
+        return { code: 'B01c', name: 'Scandinavian Defense: Mieses-Kotrč Variation', moves: '1.e4 d5 2.exd5 Qxd5 3.Nc3 Qa5' }
+      }
+      return { code: 'B01b', name: 'Scandinavian Defense: Main Line', moves: '1.e4 d5 2.exd5 Qxd5' }
+    }
+    return { code: 'B01', name: 'Scandinavian Defense', moves: '1.e4 d5' }
+  }
+
+  // Fallback to existing ECO mapping system
   for (const opening of Object.values(ECO_MAPPINGS)) {
-    if (opening.moves && moves.startsWith(opening.moves.replace(/\d+\./g, '').trim())) {
+    if (opening.moves && cleanMoves.startsWith(opening.moves.replace(/\d+\./g, '').replace(/\s+/g, ' ').trim().toLowerCase())) {
       return opening
     }
   }
+  
   return null
 }
 
@@ -601,6 +646,15 @@ export const OPENING_FAMILIES: Record<string, string> = {
   'English Opening: King\'s English Variation, Four Knights, Fianchetto Variation': 'English Opening',
   'English Opening: Symmetrical Variation': 'English Opening',
 
+  // Scandinavian Defense family
+  'Scandinavian Defense': 'Scandinavian Defense',
+  'Scandinavian Defense: Modern Variation': 'Scandinavian Defense',
+  'Scandinavian Defense: Main Line': 'Scandinavian Defense',
+  'Scandinavian Defense: Mieses-Kotrč Variation': 'Scandinavian Defense',
+  'Scandinavian Defense: Blackburne-Kloosterboer Gambit': 'Scandinavian Defense',
+  'Scandinavian Defense: Portuguese Variation': 'Scandinavian Defense',
+  'Scandinavian Defense: Gubinsky-Melts Defense': 'Scandinavian Defense',
+
   // Alekhine's Defense family
   'Alekhine\'s Defense': 'Alekhine\'s Defense',
   'Alekhine\'s Defense: Four Pawns Attack': 'Alekhine\'s Defense',
@@ -623,6 +677,12 @@ export const OPENING_FAMILIES: Record<string, string> = {
 
   // London System family
   'Queen\'s Pawn Game: London System': 'London System',
+  'London System': 'London System',
+  'London System: Traditional': 'London System',
+  'London System: Accelerated': 'London System',
+  'London System vs King\'s Indian Defense': 'London System',
+  'London System vs French Defense': 'London System',
+  'London System vs Caro-Kann Defense': 'London System',
 
   // Nimzo-Indian Defense family
   'Nimzo-Indian Defense': 'Nimzo-Indian Defense',
