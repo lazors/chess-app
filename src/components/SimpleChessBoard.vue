@@ -11,7 +11,12 @@
           'selected': selectedSquare === index,
           'possible-move': possibleMoves.includes(index)
         }"
+        :aria-label="getSquareAriaLabel(index, square)"
+        :tabindex="props.interactive ? '0' : '-1'"
+        role="button"
         @click="handleSquareClick(index)"
+        @keydown.enter="handleSquareClick(index)"
+        @keydown.space.prevent="handleSquareClick(index)"
       >
         <div v-if="square" class="piece" :class="getPieceClass(square)">
           {{ getPieceSymbol(square) }}
@@ -46,6 +51,7 @@ const props = withDefaults(defineProps<Props>(), {
 const emit = defineEmits<{
   move: [move: { from: string; to: string; promotion?: string }]
   gameEnd: [result: string]
+  error: [message: string]
 }>()
 
 const game = ref(new Chess())
@@ -54,9 +60,14 @@ const possibleMoves = ref<number[]>([])
 const orientation = ref(props.orientation)
 
 // Convert board array to squares for display
+interface ChessPiece {
+  type: 'p' | 'r' | 'n' | 'b' | 'q' | 'k'
+  color: 'w' | 'b'
+}
+
 const squares = computed(() => {
   const board = game.value.board()
-  const flatBoard: (any | null)[] = []
+  const flatBoard: (ChessPiece | null)[] = []
 
   for (let rank = 0; rank < 8; rank++) {
     for (let file = 0; file < 8; file++) {
@@ -96,15 +107,15 @@ const squareToIndex = (square: string): number => {
   }
 }
 
-const getPieceClass = (piece: any): string => {
+const getPieceClass = (piece: ChessPiece | null): string => {
   if (!piece) return ''
   return `${piece.color}-${piece.type}`
 }
 
-const getPieceSymbol = (piece: any): string => {
+const getPieceSymbol = (piece: ChessPiece | null): string => {
   if (!piece) return ''
 
-  const symbols: Record<string, Record<string, string>> = {
+  const symbols: Record<ChessPiece['color'], Record<ChessPiece['type'], string>> = {
     w: {
       k: '♔', q: '♕', r: '♖', b: '♗', n: '♘', p: '♙'
     },
@@ -116,6 +127,21 @@ const getPieceSymbol = (piece: any): string => {
   return symbols[piece.color]?.[piece.type] || ''
 }
 
+const getSquareAriaLabel = (index: number, piece: ChessPiece | null): string => {
+  const square = indexToSquare(index)
+  const pieceNames: Record<ChessPiece['type'], string> = {
+    k: 'King', q: 'Queen', r: 'Rook', b: 'Bishop', n: 'Knight', p: 'Pawn'
+  }
+  
+  if (piece) {
+    const pieceName = pieceNames[piece.type]
+    const color = piece.color === 'w' ? 'White' : 'Black'
+    return `${color} ${pieceName} on ${square}`
+  }
+  
+  return `Empty square ${square}`
+}
+
 const handleSquareClick = (index: number) => {
   if (!props.interactive) return
 
@@ -123,7 +149,7 @@ const handleSquareClick = (index: number) => {
 
   if (selectedSquare.value === null) {
     // Select a piece
-    const piece = game.value.get(square)
+    const piece = game.value.get(square as any) // Chess.js types are incomplete
     if (piece) {
       selectedSquare.value = index
       updatePossibleMoves(square)
@@ -158,7 +184,9 @@ const handleSquareClick = (index: number) => {
           }
         }
       } catch (error) {
-        console.log('Invalid move')
+        // Invalid move - provide user feedback
+        // Could emit an event here for parent components to show error message
+        emit('error', 'Invalid move attempted')
       }
 
       selectedSquare.value = null
@@ -168,7 +196,7 @@ const handleSquareClick = (index: number) => {
 }
 
 const updatePossibleMoves = (square: string) => {
-  const moves = game.value.moves({ square, verbose: true })
+  const moves = game.value.moves({ square: square as any, verbose: true }) as any[] // Chess.js types need updating
   possibleMoves.value = moves.map(move => squareToIndex(move.to))
 }
 
@@ -276,6 +304,15 @@ defineExpose({
 
 .square:hover {
   opacity: 0.8;
+}
+
+.square:focus {
+  outline: 2px solid #007bff;
+  outline-offset: -2px;
+}
+
+.square:focus:not(:focus-visible) {
+  outline: none;
 }
 
 .piece {
