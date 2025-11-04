@@ -24,10 +24,48 @@ export class ChessComApiService {
     timeout: API_CONFIG.TIMEOUT,
   })
 
+  // Request cache with TTL
+  private cache = new Map<string, { data: any; timestamp: number; ttl: number }>()
+
+  private isValidCache(cacheEntry: { timestamp: number; ttl: number }): boolean {
+    return Date.now() - cacheEntry.timestamp < cacheEntry.ttl
+  }
+
+  private getFromCache<T>(key: string): T | null {
+    const cached = this.cache.get(key)
+    if (cached && this.isValidCache(cached)) {
+      return cached.data
+    }
+    if (cached) {
+      this.cache.delete(key) // Remove expired cache
+    }
+    return null
+  }
+
+  private setCache(key: string, data: any, ttl: number = API_CONFIG.CACHE_TTL): void {
+    this.cache.set(key, { data, timestamp: Date.now(), ttl })
+    
+    // Cleanup old cache entries (basic LRU)
+    if (this.cache.size > 100) {
+      const oldestKey = this.cache.keys().next().value
+      if (oldestKey) {
+        this.cache.delete(oldestKey)
+      }
+    }
+  }
+
   async getUserProfile(username: string): Promise<ChessComProfile> {
+    const cacheKey = `profile-${username.toLowerCase()}`
+    const cached = this.getFromCache<ChessComProfile>(cacheKey)
+    if (cached) {
+      return cached
+    }
+
     try {
       const response = await this.axiosInstance.get(`/player/${username}`)
-      return response.data
+      const data = response.data
+      this.setCache(cacheKey, data, API_CONFIG.CACHE_TTL)
+      return data
     } catch (error) {
       console.error('Error fetching user profile:', error)
       throw new Error(`Failed to fetch profile for user: ${username}`)
@@ -35,9 +73,17 @@ export class ChessComApiService {
   }
 
   async getUserStats(username: string): Promise<ChessComStats> {
+    const cacheKey = `stats-${username.toLowerCase()}`
+    const cached = this.getFromCache<ChessComStats>(cacheKey)
+    if (cached) {
+      return cached
+    }
+
     try {
       const response = await this.axiosInstance.get(`/player/${username}/stats`)
-      return response.data
+      const data = response.data
+      this.setCache(cacheKey, data, API_CONFIG.CACHE_TTL)
+      return data
     } catch (error) {
       console.error('Error fetching user stats:', error)
       throw new Error(`Failed to fetch stats for user: ${username}`)
