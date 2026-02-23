@@ -646,6 +646,22 @@ export const OPENING_FAMILIES: Record<string, string> = {
   'English Opening: King\'s English Variation, Four Knights, Fianchetto Variation': 'English Opening',
   'English Opening: Symmetrical Variation': 'English Opening',
 
+  // Scotch Game family
+  'Scotch Game': 'Scotch Game',
+  'Scotch Game: Classical Variation': 'Scotch Game',
+  'Scotch Game: Schmid Variation': 'Scotch Game',
+  'Scotch Game: Mieses Variation': 'Scotch Game',
+  'Scotch Game: Scotch Gambit': 'Scotch Game',
+  'Scotch Game: Göring Gambit': 'Scotch Game',
+  'Scotch Game: Blumenfeld Attack': 'Scotch Game',
+  'Scotch Game: Potter Variation': 'Scotch Game',
+  'Scotch Game: Steinitz Variation': 'Scotch Game',
+  'Scotch Game: Malaniuk Variation': 'Scotch Game',
+  'Scotch Game: Romanishin Variation': 'Scotch Game',
+  'Scotch Game: Meitner Variation': 'Scotch Game',
+  'Scotch Game: Haxo Gambit': 'Scotch Game',
+  'Scotch Game: Horwitz Attack': 'Scotch Game',
+
   // Scandinavian Defense family
   'Scandinavian Defense': 'Scandinavian Defense',
   'Scandinavian Defense: Modern Variation': 'Scandinavian Defense',
