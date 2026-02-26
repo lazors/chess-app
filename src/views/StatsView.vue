@@ -336,106 +336,71 @@
           </button>
         </div>
 
-        <!-- White Openings -->
-        <div
-          v-if="
-            activeOpeningTab === 'white' &&
-            chessStore.coloredOpeningStats.white.length > 0
-          "
-          class="openings-grid"
-        >
-          <div
-            v-for="opening in chessStore.coloredOpeningStats.white"
-            :key="`white-${opening.opening}`"
-            class="opening-card white-opening"
+        <!-- Sort Controls -->
+        <div class="sort-controls">
+          <span class="sort-label">Sort by:</span>
+          <button
+            :class="['sort-button', { active: openingSortBy === 'games' }]"
+            @click="openingSortBy = 'games'"
           >
-            <h3 class="opening-name">{{ opening.opening }}</h3>
-            <div class="opening-stats">
-              <div class="stat-row">
-                <span class="stat-label">Games:</span>
-                <span class="stat-value">{{ opening.games }}</span>
-              </div>
-              <div class="stat-row">
-                <span class="stat-label">Win Rate:</span>
-                <span
-                  class="stat-value"
-                  :class="getWinRateClass(opening.winRate)"
-                  >{{ opening.winRate }}%</span
-                >
-              </div>
-              <div class="stat-row">
-                <span class="stat-label">W/L/D:</span>
-                <span class="stat-value"
-                  >{{ opening.wins }}/{{ opening.losses }}/{{
-                    opening.draws
-                  }}</span
-                >
-              </div>
-              <div class="stat-row">
-                <span class="stat-label">Avg Rating:</span>
-                <span class="stat-value">{{ opening.averageRating }}</span>
-              </div>
-            </div>
-          </div>
+            Most Played
+          </button>
+          <button
+            :class="['sort-button', { active: openingSortBy === 'winRate' }]"
+            @click="openingSortBy = 'winRate'"
+          >
+            Best Win Rate
+          </button>
+          <button
+            :class="['sort-button', { active: openingSortBy === 'lossRate' }]"
+            @click="openingSortBy = 'lossRate'"
+          >
+            Highest Loss Rate
+          </button>
         </div>
 
-        <!-- Black Openings -->
+        <!-- Openings Grid (shared template for all tabs) -->
         <div
-          v-if="
-            activeOpeningTab === 'black' &&
-            chessStore.coloredOpeningStats.black.length > 0
-          "
+          v-if="sortedOpenings[activeOpeningTab].length > 0"
           class="openings-grid"
         >
           <div
-            v-for="opening in chessStore.coloredOpeningStats.black"
-            :key="`black-${opening.opening}`"
-            class="opening-card black-opening"
+            v-for="opening in sortedOpenings[activeOpeningTab]"
+            :key="`${activeOpeningTab}-${opening.opening}`"
+            :class="['opening-card', `${activeOpeningTab}-opening`]"
           >
-            <h3 class="opening-name">{{ opening.opening }}</h3>
-            <div class="opening-stats">
-              <div class="stat-row">
-                <span class="stat-label">Games:</span>
-                <span class="stat-value">{{ opening.games }}</span>
-              </div>
-              <div class="stat-row">
-                <span class="stat-label">Win Rate:</span>
-                <span
-                  class="stat-value"
-                  :class="getWinRateClass(opening.winRate)"
-                  >{{ opening.winRate }}%</span
-                >
-              </div>
-              <div class="stat-row">
-                <span class="stat-label">W/L/D:</span>
-                <span class="stat-value"
-                  >{{ opening.wins }}/{{ opening.losses }}/{{
-                    opening.draws
-                  }}</span
-                >
-              </div>
-              <div class="stat-row">
-                <span class="stat-label">Avg Rating:</span>
-                <span class="stat-value">{{ opening.averageRating }}</span>
-              </div>
+            <div class="opening-card-header">
+              <h3 class="opening-name">{{ opening.opening }}</h3>
+              <span
+                :class="['performance-badge', getPerformanceLabelClass(opening.winRate)]"
+              >{{ getPerformanceLabel(opening.winRate) }}</span>
             </div>
-          </div>
-        </div>
+            <span v-if="opening.eco" class="eco-code">{{ opening.eco }}</span>
 
-        <!-- Combined Openings -->
-        <div
-          v-if="
-            activeOpeningTab === 'combined' &&
-            chessStore.coloredOpeningStats.combined.length > 0
-          "
-          class="openings-grid"
-        >
-          <div
-            v-for="opening in chessStore.coloredOpeningStats.combined"
-            :key="`combined-${opening.opening}`"
-            class="opening-card combined-opening"
-          >
-            <h3 class="opening-name">{{ opening.opening }}</h3>
+            <!-- Visual W/L/D Bar -->
+            <div class="wld-bar">
+              <div
+                class="wld-segment wld-win"
+                :style="{ width: (opening.wins / opening.games * 100) + '%' }"
+                :title="`Wins: ${opening.wins}`"
+              ></div>
+              <div
+                class="wld-segment wld-draw"
+                :style="{ width: (opening.draws / opening.games * 100) + '%' }"
+                :title="`Draws: ${opening.draws}`"
+              ></div>
+              <div
+                class="wld-segment wld-loss"
+                :style="{ width: (opening.losses / opening.games * 100) + '%' }"
+                :title="`Losses: ${opening.losses}`"
+              ></div>
+            </div>
+            <div class="wld-legend">
+              <span class="wld-legend-item win-legend">W: {{ opening.wins }}</span>
+              <span class="wld-legend-item draw-legend">D: {{ opening.draws }}</span>
+              <span class="wld-legend-item loss-legend">L: {{ opening.losses }}</span>
+            </div>
+
             <div class="opening-stats">
               <div class="stat-row">
                 <span class="stat-label">Games:</span>
@@ -446,16 +411,14 @@
                 <span
                   class="stat-value"
                   :class="getWinRateClass(opening.winRate)"
-                  >{{ opening.winRate }}%</span
-                >
+                >{{ opening.winRate }}%</span>
               </div>
               <div class="stat-row">
-                <span class="stat-label">W/L/D:</span>
-                <span class="stat-value"
-                  >{{ opening.wins }}/{{ opening.losses }}/{{
-                    opening.draws
-                  }}</span
-                >
+                <span class="stat-label">Loss Rate:</span>
+                <span
+                  class="stat-value"
+                  :class="getLossRate(opening) >= 50 ? 'poor' : ''"
+                >{{ getLossRate(opening) }}%</span>
               </div>
               <div class="stat-row">
                 <span class="stat-label">Avg Rating:</span>
@@ -558,6 +521,28 @@ import BestGames from '@/components/BestGames.vue';
 
 const chessStore = useChessStore();
 const activeOpeningTab = ref<'white' | 'black' | 'combined'>('combined');
+const openingSortBy = ref<'games' | 'winRate' | 'lossRate'>('games');
+
+const sortedOpenings = computed(() => {
+  const stats = chessStore.coloredOpeningStats;
+  if (!stats) return { white: [], black: [], combined: [] };
+
+  const sortFn = (a: { games: number; wins: number; losses: number; winRate: number }, b: { games: number; wins: number; losses: number; winRate: number }) => {
+    if (openingSortBy.value === 'winRate') return b.winRate - a.winRate;
+    if (openingSortBy.value === 'lossRate') {
+      const aLossRate = a.games > 0 ? a.losses / a.games : 0;
+      const bLossRate = b.games > 0 ? b.losses / b.games : 0;
+      return bLossRate - aLossRate;
+    }
+    return b.games - a.games;
+  };
+
+  return {
+    white: [...stats.white].sort(sortFn),
+    black: [...stats.black].sort(sortFn),
+    combined: [...stats.combined].sort(sortFn),
+  };
+});
 
 const winRate = computed(() => {
   const record = chessStore.winLossRecord;
@@ -579,6 +564,27 @@ const getWinRateClass = (winRate: number): string => {
   if (winRate >= 50) return 'good';
   if (winRate >= 40) return 'average';
   return 'poor';
+};
+
+const getLossRate = (opening: { games: number; losses: number }): number => {
+  if (opening.games === 0) return 0;
+  return Math.round((opening.losses / opening.games) * 100);
+};
+
+const getPerformanceLabel = (winRate: number): string => {
+  if (winRate >= 70) return 'Excellent';
+  if (winRate >= 60) return 'Strong';
+  if (winRate >= 50) return 'Solid';
+  if (winRate >= 40) return 'Needs Work';
+  return 'Struggling';
+};
+
+const getPerformanceLabelClass = (winRate: number): string => {
+  if (winRate >= 70) return 'perf-excellent';
+  if (winRate >= 60) return 'perf-strong';
+  if (winRate >= 50) return 'perf-solid';
+  if (winRate >= 40) return 'perf-needs-work';
+  return 'perf-struggling';
 };
 </script>
 
@@ -1066,6 +1072,166 @@ const getWinRateClass = (winRate: number): string => {
   border-color: var(--accent-primary);
   color: white;
   box-shadow: var(--shadow);
+}
+
+/* Sort controls */
+.sort-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.sort-label {
+  font-weight: 600;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.sort-button {
+  padding: 0.5rem 1rem;
+  border: 1px solid var(--border-color);
+  background: var(--bg-secondary);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  transition: all 0.2s ease;
+}
+
+.sort-button:hover {
+  border-color: var(--accent-primary);
+  color: var(--accent-primary);
+}
+
+.sort-button.active {
+  background: var(--accent-primary);
+  border-color: var(--accent-primary);
+  color: white;
+}
+
+/* Opening card header with performance badge */
+.opening-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 0.75rem;
+  margin-bottom: 0.25rem;
+}
+
+.opening-card-header .opening-name {
+  margin: 0;
+}
+
+/* Performance badge */
+.performance-badge {
+  padding: 0.25rem 0.6rem;
+  border-radius: var(--radius-md);
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.perf-excellent {
+  background: rgba(16, 185, 129, 0.15);
+  color: #10b981;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.perf-strong {
+  background: rgba(132, 204, 22, 0.15);
+  color: #65a30d;
+  border: 1px solid rgba(132, 204, 22, 0.3);
+}
+
+.perf-solid {
+  background: rgba(59, 130, 246, 0.15);
+  color: #3b82f6;
+  border: 1px solid rgba(59, 130, 246, 0.3);
+}
+
+.perf-needs-work {
+  background: rgba(245, 158, 11, 0.15);
+  color: #f59e0b;
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.perf-struggling {
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+/* ECO code */
+.eco-code {
+  display: inline-block;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  padding: 0.15rem 0.5rem;
+  border-radius: var(--radius-sm, 4px);
+  margin-bottom: 0.75rem;
+}
+
+/* W/L/D visual bar */
+.wld-bar {
+  display: flex;
+  height: 8px;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 0.4rem;
+  background: var(--border-color);
+}
+
+.wld-segment {
+  transition: width 0.3s ease;
+  min-width: 0;
+}
+
+.wld-win {
+  background: #10b981;
+}
+
+.wld-draw {
+  background: #f59e0b;
+}
+
+.wld-loss {
+  background: #ef4444;
+}
+
+/* W/L/D legend */
+.wld-legend {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 0.75rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.wld-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.win-legend {
+  color: #10b981;
+}
+
+.draw-legend {
+  color: #f59e0b;
+}
+
+.loss-legend {
+  color: #ef4444;
 }
 
 /* Opening card color variants */
